@@ -2,6 +2,10 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://www.gwtproject.org/doctype/2.8.0/gwt-module.dtd">
 <module rename-to="html">
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
+	<inherits name="space.earlygrey.shapedrawer"/>
+	<inherits name="regexodus.regexodus" />
+	<inherits name="com.github.tommyettinger.textratypist" />
+	<inherits name="com.esotericsoftware.spine" />
 
 	<inherits name='ShadowsOfTheNight' />
 	<entry-point class='fr.formiko.shadowsofthenigth.client.HtmlLauncher' />

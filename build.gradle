@@ -104,7 +104,7 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
         implementation "com.github.tommyettinger:textratypist:$textratypistVersion"
-        // implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "com.esotericsoftware.spine:spine-libgdx:$spineVersion"
         
     }

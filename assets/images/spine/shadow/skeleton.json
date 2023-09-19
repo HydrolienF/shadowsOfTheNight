@@ -1,0 +1,50 @@
+{
+"skeleton": {
+	"hash": "7CgHz/BHorc",
+	"spine": "4.1.23",
+	"x": -512.64,
+	"y": -512.64,
+	"width": 1025.29,
+	"height": 1025.29,
+	"images": "../../../git/shadowsOfTheNight/gimp images/shadow/",
+	"audio": ""
+},
+"bones": [
+	{ "name": "root" },
+	{ "name": "head", "parent": "root" },
+	{ "name": "body", "parent": "root" }
+],
+"slots": [
+	{ "name": "shadow", "bone": "body", "attachment": "shadow" },
+	{ "name": "head", "bone": "head", "attachment": "head" }
+],
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"shadow": {
+				"shadow": { "rotation": 0.07, "width": 1024, "height": 1024 }
+			}
+		}
+	},
+	{
+		"name": "bad",
+		"attachments": {
+			"head": {
+				"head": { "name": "shadow head bad", "width": 1024, "height": 1024 }
+			}
+		}
+	},
+	{
+		"name": "sad",
+		"attachments": {
+			"head": {
+				"head": { "name": "shadow head sad", "width": 1024, "height": 1024 }
+			}
+		}
+	}
+],
+"animations": {
+	"animation": {}
+}
+}

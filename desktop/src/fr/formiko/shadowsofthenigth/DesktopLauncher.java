@@ -8,7 +8,9 @@ public class DesktopLauncher {
 	public static void main(String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
-		config.setTitle("ShadowsOfTheNight");
+		config.setTitle("Shadows of the night");
+		config.setMaximized(true);
+		// config.setWindowIcon("images/icon.png");
 		new Lwjgl3Application(new ShadowsOfTheNight(), config);
 	}
 }

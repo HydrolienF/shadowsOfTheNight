@@ -1,0 +1,13 @@
+shadow.png
+size:2048,1024
+filter:MipMapLinearLinear,MipMapLinearLinear
+pma:true
+shadow
+bounds:974,4,481,751
+offsets:276,238,1024,1024
+shadow head bad
+bounds:4,4,230,95
+offsets:412,796,1024,1024
+shadow head sad
+bounds:489,4,225,90
+offsets:414,796,1024,1024
