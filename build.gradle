@@ -16,6 +16,24 @@ buildscript {
     }
 }
 
+task writeAllAssetsToFile {
+    doLast {
+        // projectfolder/assets
+        def assetsFolder = new File("${project.rootDir}/assets/")
+        // projectfolder/assets/assets.txt
+        def assetsFile = new File(assetsFolder, "assets.txt")
+        // delete that file in case we've already created it
+        assetsFile.delete()
+
+        // iterate through all files inside that folder
+        // convert it to a relative path
+        // and append it to assets.txt the file
+        fileTree(assetsFolder).collect {assetsFolder.relativePath(it) }.each {
+            assetsFile.append(it + "\n")
+        }
+    }
+}
+
 allprojects {
     apply plugin: "eclipse"
 
@@ -28,6 +46,10 @@ allprojects {
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
+        shapedrawerVersion = '2.5.0'
+        textratypistVersion = '0.8.0'
+        regexodusVersion = '0.1.15'
+        spineVersion = '4.1.0'
     }
 
     repositories {
@@ -43,6 +65,7 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java-library"
+    compileJava.dependsOn writeAllAssetsToFile
 
 
     dependencies {
@@ -65,6 +88,10 @@ project(":html") {
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion:sources"
+        implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
+        implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
+        implementation "com.esotericsoftware.spine:spine-libgdx:$spineVersion:sources"
         
     }
 }
@@ -75,6 +102,10 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
+        implementation "com.github.tommyettinger:textratypist:$textratypistVersion"
+        // implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        implementation "com.esotericsoftware.spine:spine-libgdx:$spineVersion"
         
     }
 }
