@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -22,9 +26,14 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private Stage stage2;
 	private static Assets assets;
 	private List<Shadow> shadows;
+	public static World world;
+	private Box2DDebugRenderer debugRenderer;
 
 	@Override
 	public void create() {
+		Box2D.init();
+		world = new World(new Vector2(0, 0), true);
+		debugRenderer = new Box2DDebugRenderer(); // @a
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		batch = new SpriteBatch();
@@ -38,12 +47,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		stage1 = new Stage(viewport, batch);
 		stage1.addActor(new Image(new Texture("images/MainImage.png")));
 		shadows = new LinkedList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1; i++) {
 			Shadow shadow = new Shadow();
 			shadow.setScale(0.1f);
 			shadow.setPosition(Gdx.graphics.getWidth() - 100, 100);
 			shadows.add(shadow);
 			stage1.addActor(shadow);
+			shadow.isPlayer = true;
 		}
 	}
 
@@ -57,6 +67,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			stage2.act();
 			stage2.draw();
 		}
+		world.step(1 / 60f, 6, 2);
+		debugRenderer.render(world, camera.combined);
 	}
 
 	@Override
@@ -69,4 +81,5 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	}
 
 	public static Assets getAssets() { return assets; }
+
 }

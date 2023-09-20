@@ -55,7 +55,7 @@ public class SActor extends SkeletonActor {
     @Override
     public void act(float delta) {
         if (getSkeleton() != null) {
-            getSkeleton().findBone("root").setRotation(getRotation());
+            getSkeleton().findBone("root").setRotation(getRotation() - 90f);
             getSkeleton().setScale(getScaleX(), getScaleY());
             // if (mapItem instanceof Creature c && getAnimationState() != null && getAnimationState().getCurrent(0) != null) {
             // getAnimationState().getCurrent(0).setTimeScale((c).getCurrentSpeed() * 0.3f * c.getAnimationSpeedMultiplier());
