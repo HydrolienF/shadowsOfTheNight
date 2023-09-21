@@ -1,7 +1,9 @@
 images/MainImage.png
+images/null.png
 images/spine/Frenchzebutt/Frenchzebutt.atlas
 images/spine/Frenchzebutt/Frenchzebutt.png
 images/spine/Frenchzebutt/skeleton.json
 images/spine/shadow/shadow.atlas
 images/spine/shadow/shadow.png
 images/spine/shadow/skeleton.json
+images/wall.png

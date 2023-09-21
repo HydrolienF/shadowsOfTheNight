@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class ShadowsOfTheNight extends ApplicationAdapter {
-	private Camera camera;
+	public static Camera camera;
 	private ScreenViewport viewport;
 	private SpriteBatch batch;
 	private Stage stage1;
@@ -55,6 +55,12 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			stage1.addActor(shadow);
 			shadow.isPlayer = true;
 		}
+		stage1.addActor(new Obstacle("wall", Gdx.graphics.getWidth(), 10, 0, 0));
+		stage1.addActor(new Obstacle("wall", Gdx.graphics.getWidth(), 10, 0, Gdx.graphics.getHeight() - 10));
+		stage1.addActor(new Obstacle("wall", 10, Gdx.graphics.getHeight(), 0, 0));
+		stage1.addActor(new Obstacle("wall", 10, Gdx.graphics.getHeight(), Gdx.graphics.getWidth() - 10, 0));
+		stage1.addActor(new Obstacle(500, 150, 600, Gdx.graphics.getHeight() - 150));
+		stage1.addActor(new Obstacle(150, 150, 650, 320));
 	}
 
 	@Override

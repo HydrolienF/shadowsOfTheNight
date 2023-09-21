@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -15,7 +14,6 @@ import com.esotericsoftware.spine.Slot;
 
 public class Shadow extends SActor {
     private Color bodyColor;
-    private Body body;
     public boolean isPlayer;
     public static final float MAX_VELOCITY = 20000f;
     public static final float MAX_INPULSE = 5000f;
@@ -26,11 +24,11 @@ public class Shadow extends SActor {
         Slot colorSlot = getSkeleton().findSlot("shadow");
         colorSlot.getColor().set(bodyColor);
         getSkeleton().setSkin("bad");
-        body = createBody();
+        createBody();
         body.setUserData(this);
     }
 
-    public Body createBody() {
+    public void createBody() {
         // First we create a body definition
         BodyDef bodyDef = new BodyDef();
         //
@@ -40,7 +38,7 @@ public class Shadow extends SActor {
         bodyDef.position.set(getX(), getY());
 
         // Create our body in the world using our body definition
-        Body body = ShadowsOfTheNight.world.createBody(bodyDef);
+        body = ShadowsOfTheNight.world.createBody(bodyDef);
 
         // Create a circle shape and set its radius to 6
         CircleShape circle = new CircleShape();
@@ -58,9 +56,7 @@ public class Shadow extends SActor {
 
         // Remember to dispose of any shapes after you're done with them!
         // BodyDef and FixtureDef don't need disposing, but shapes do.
-        // circle.dispose();
-
-        return body;
+        circle.dispose();
     }
 
     @Override

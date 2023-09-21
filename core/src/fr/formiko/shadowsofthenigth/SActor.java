@@ -1,6 +1,7 @@
 package fr.formiko.shadowsofthenigth;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.AnimationStateData;
 import com.esotericsoftware.spine.Skeleton;
@@ -8,6 +9,8 @@ import com.esotericsoftware.spine.SkeletonRenderer;
 import com.esotericsoftware.spine.utils.SkeletonActor;
 
 public class SActor extends SkeletonActor {
+    protected Body body;
+
 
     public SActor(String textureName) {
         super();
