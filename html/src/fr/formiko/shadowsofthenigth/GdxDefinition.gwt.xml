@@ -7,6 +7,7 @@
 	<inherits name="regexodus.regexodus" />
 	<inherits name="com.github.tommyettinger.textratypist" />
 	<inherits name="com.esotericsoftware.spine" />
+	<inherits name='Box2DLights' />
 
 	<inherits name='ShadowsOfTheNight' />
 	<entry-point class='fr.formiko.shadowsofthenigth.client.HtmlLauncher' />

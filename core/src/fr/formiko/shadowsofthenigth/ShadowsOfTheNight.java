@@ -6,6 +6,8 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,8 +17,9 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import box2dLight.ConeLight;
+import box2dLight.RayHandler;
 
 public class ShadowsOfTheNight extends ApplicationAdapter {
 	public static Camera camera;
@@ -28,6 +31,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private List<Shadow> shadows;
 	public static World world;
 	private Box2DDebugRenderer debugRenderer;
+	private RayHandler rayHandler;
+	private float ambiantLight = 0.4f;
 
 	@Override
 	public void create() {
@@ -41,6 +46,38 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		stage1 = null;
 		stage2 = null;
 		playGame1();
+
+		rayHandler = new RayHandler(world);
+		rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, ambiantLight);
+		rayHandler.setBlur(true);
+		rayHandler.setBlurNum(3);
+		// rayHandler.useDiffuseLight(true);
+		// rayHandler.setBlurNum(3);
+
+		// PointLight pl = new PointLight(rayHandler, 128, new Color(0.2f, 1, 1, 1f), 10, -5, 2);
+		// PointLight pl2 = new PointLight(rayHandler, 128, new Color(1, 0, 1, 1f), 10, 5, 2);
+		// PointLight light = new PointLight(rayHandler, 32);
+		// light.setActive(true);
+		// light.setColor(Color.RED);
+		// light.setDistance(400f);
+		// light.setPosition(0, 0);
+
+		rayHandler.setShadows(true);
+		// pl.setStaticLight(false);
+		// pl.setSoft(true);
+		ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 10000, 0, 0, 0, 4);
+		cl.setPosition(50, 500);
+		cl.setActive(true);
+		cl.setSoft(true);
+		// cl.setStaticLight(false);
+		cl.setSoftnessLength(2f);
+		// TODO react to light intersect with shadow
+
+		// cl.setSoft(true);
+		// cl.setSoftnessLength(0.5f);
+
+		// Add a light to the stage
+
 	}
 
 	public void playGame1() {
@@ -65,7 +102,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		ScreenUtils.clear(0, 0, 1, 1);
+		// ScreenUtils.clear(0, 0, 1, 1);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		if (stage1 != null) {
 			stage1.act();
 			stage1.draw();
@@ -75,6 +114,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		}
 		world.step(1 / 60f, 6, 2);
 		debugRenderer.render(world, camera.combined);
+
+		rayHandler.setCombinedMatrix(stage1.getCamera().combined, 0, 0, 1, 1);
+		rayHandler.updateAndRender();
 	}
 
 	@Override
