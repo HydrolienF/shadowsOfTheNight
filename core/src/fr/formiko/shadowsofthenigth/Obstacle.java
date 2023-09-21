@@ -9,16 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Obstacle extends Image {
     private Body body;
-    public Obstacle(String textureName, int width, int height, int x, int y) {
+    public Obstacle(String textureName, float width, float height, float x, float y) {
         super(new Texture("images/" + textureName + ".png"));
         createBody(width, height, x, y);
         body.setUserData(this);
         setBounds(x, y, width, height);
     }
-    public Obstacle(int width, int height, int x, int y) { this(null, width, height, x, y); }
+    public Obstacle(float width, float height, float x, float y) { this(null, width, height, x, y); }
 
 
-    public void createBody(int width, int height, int x, int y) {
+    public void createBody(float width, float height, float x, float y) {
         // Create our body definition
         BodyDef groundBodyDef = new BodyDef();
         // Set its world position

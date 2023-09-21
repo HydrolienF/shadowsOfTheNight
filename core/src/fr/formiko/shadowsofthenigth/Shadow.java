@@ -42,7 +42,7 @@ public class Shadow extends SActor {
 
         // Create a circle shape and set its radius to 6
         CircleShape circle = new CircleShape();
-        circle.setRadius(40f);
+        circle.setRadius(40f * ShadowsOfTheNight.getWidthRacio());
 
         // Create a fixture definition to apply our shape to
         FixtureDef fixtureDef = new FixtureDef();
@@ -63,7 +63,7 @@ public class Shadow extends SActor {
     public void act(float delta) {
         super.act(delta);
         if (isPlayer) {
-            applyPlayerMove();
+            applyPlayerMove(delta);
         }
         // if(delete){
         // world.destroyBody(body);
@@ -73,27 +73,29 @@ public class Shadow extends SActor {
         this.setPosition(body.getPosition().x - this.getWidth() / 2, body.getPosition().y - this.getHeight() / 2);
     }
 
-    public void applyPlayerMove() {
+    public void applyPlayerMove(float delta) {
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
+        float racio = delta * 60f;
+        // TODO TOFIX shadow should move with same speed whatever the framerate is
         // body.applyForceToCenter(1.0f, 0.0f, true);
 
         // apply left impulse, but only if max velocity is not reached yet
-        if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x > -MAX_VELOCITY) {
-            body.applyLinearImpulse(-MAX_INPULSE, 0, pos.x, pos.y, true);
+        if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x * racio > -MAX_VELOCITY) {
+            body.applyLinearImpulse(-MAX_INPULSE * racio, 0, pos.x, pos.y, true);
         }
 
         // apply right impulse, but only if max velocity is not reached yet
-        if (Gdx.input.isKeyPressed(Keys.RIGHT) && vel.x < MAX_VELOCITY) {
-            body.applyLinearImpulse(MAX_INPULSE, 0, pos.x, pos.y, true);
+        if (Gdx.input.isKeyPressed(Keys.RIGHT) && vel.x * racio < MAX_VELOCITY) {
+            body.applyLinearImpulse(MAX_INPULSE * racio, 0, pos.x, pos.y, true);
         }
 
-        if (Gdx.input.isKeyPressed(Keys.UP) && vel.y < MAX_VELOCITY) {
-            body.applyLinearImpulse(0, MAX_INPULSE, pos.x, pos.y, true);
+        if (Gdx.input.isKeyPressed(Keys.UP) && vel.y * racio < MAX_VELOCITY) {
+            body.applyLinearImpulse(0, MAX_INPULSE * racio, pos.x, pos.y, true);
         }
 
-        if (Gdx.input.isKeyPressed(Keys.DOWN) && vel.y > -MAX_VELOCITY) {
-            body.applyLinearImpulse(0, -MAX_INPULSE, pos.x, pos.y, true);
+        if (Gdx.input.isKeyPressed(Keys.DOWN) && vel.y * racio > -MAX_VELOCITY) {
+            body.applyLinearImpulse(0, -MAX_INPULSE * racio, pos.x, pos.y, true);
         }
 
         // set rotation of the body from the direction of the velocity

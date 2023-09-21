@@ -33,6 +33,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private Box2DDebugRenderer debugRenderer;
 	private RayHandler rayHandler;
 	private float ambiantLight = 0.4f;
+	public static ShadowsOfTheNight game;
+
+	public ShadowsOfTheNight() { game = this; }
 
 	@Override
 	public void create() {
@@ -82,12 +85,14 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public void playGame1() {
 		stage1 = new Stage(viewport, batch);
-		stage1.addActor(new Image(new Texture("images/MainImage.png")));
+		Image backgroundImage = new Image(new Texture("images/MainImage.png"));
+		backgroundImage.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		stage1.addActor(backgroundImage);
 		shadows = new LinkedList<>();
 		for (int i = 0; i < 1; i++) {
 			Shadow shadow = new Shadow();
 			shadow.setScale(0.1f);
-			shadow.setPosition(Gdx.graphics.getWidth() - 100, 100);
+			shadow.setPosition(Gdx.graphics.getWidth() - 100 * getWidthRacio(), 100 * getHeightRacio());
 			shadows.add(shadow);
 			stage1.addActor(shadow);
 			shadow.isPlayer = true;
@@ -96,9 +101,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		stage1.addActor(new Obstacle("wall", Gdx.graphics.getWidth(), 10, 0, Gdx.graphics.getHeight() - 10));
 		stage1.addActor(new Obstacle("wall", 10, Gdx.graphics.getHeight(), 0, 0));
 		stage1.addActor(new Obstacle("wall", 10, Gdx.graphics.getHeight(), Gdx.graphics.getWidth() - 10, 0));
-		stage1.addActor(new Obstacle(500, 150, 600, Gdx.graphics.getHeight() - 150));
-		stage1.addActor(new Obstacle(150, 150, 650, 320));
+		stage1.addActor(new Obstacle(500 * getWidthRacio(), 170 * getHeightRacio(), 600 * getWidthRacio(),
+				Gdx.graphics.getHeight() - 170 * getHeightRacio()));
+		stage1.addActor(new Obstacle(150 * getWidthRacio(), 150 * getHeightRacio(), 650 * getWidthRacio(), 320 * getHeightRacio()));
 	}
+
+	public static float getWidthRacio() { return Gdx.graphics.getWidth() / 1920f; }
+	public static float getHeightRacio() { return Gdx.graphics.getHeight() / 1080f; }
 
 	@Override
 	public void render() {
