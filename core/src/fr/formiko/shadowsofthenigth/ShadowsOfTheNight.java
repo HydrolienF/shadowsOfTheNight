@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import box2dLight.ConeLight;
 import box2dLight.RayHandler;
@@ -42,9 +43,11 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private Label chronoLabel;
 	private Label deathLabel;
 	private static LabelStyle labelStyle;
+	private static LabelStyle normalLabelStyle;
 	private Stage hud;
-	private static int shadowsKilled;
-	private static int shadowsMissed;
+	private int shadowsKilled;
+	private int shadowsMissed;
+	private boolean endGameNextFrame;
 
 
 	public ShadowsOfTheNight() { game = this; }
@@ -63,12 +66,19 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 		BitmapFont bmf = new BitmapFont(Gdx.files.internal("fonts/bloody.fnt"));
 		labelStyle = new Label.LabelStyle(bmf, Color.WHITE);
+		BitmapFont nbmf = new BitmapFont(Gdx.files.internal("fonts/dominican.fnt"));
+		normalLabelStyle = new Label.LabelStyle(nbmf, Color.WHITE);
 
 
 		playGame1();
 	}
 
 	public void playGame1() {
+		endGameNextFrame = false;
+		if (stage2 != null) {
+			stage2.dispose();
+			stage2 = null;
+		}
 		shadowsKilled = 0;
 		shadowsMissed = 0;
 		stage1 = new Stage(viewport, batch);
@@ -85,7 +95,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			shadow.isPlayer = true;
 		}
 		stage1.addActor(new Obstacle("wall", 0, 0, Gdx.graphics.getWidth(), 10));
-		stage1.addActor(new Obstacle("wall", Gdx.graphics.getHeight() - 10, Gdx.graphics.getWidth(), 10, 0));
+		// stage1.addActor(new Obstacle("wall", Gdx.graphics.getHeight() - 10, Gdx.graphics.getWidth(), 10, 0));
 		stage1.addActor(new Obstacle("wall", 0, 0, 10, Gdx.graphics.getHeight()));
 		stage1.addActor(new Obstacle("wall", Gdx.graphics.getWidth() - 10, 0, 10, Gdx.graphics.getHeight()));
 		stage1.addActor(new Obstacle(600 * getWidthRacio(), Gdx.graphics.getHeight() - 170 * getHeightRacio(), 500 * getWidthRacio(),
@@ -97,24 +107,28 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		world.setContactListener(new BedShadowContactListener());
 
 		hud = new Stage(viewport, batch);
-		int minOfGame = 1; // TODO swap to 5.
+		int minOfGame = 10; // TODO swap to 5.
 		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
 			public void act(float delta) {
 				super.act(delta);
 				setText(chrono.getCurrentHour());
-				rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f,
-						(float) (0.1f + ambiantLight * (1 - Math.sqrt(chrono.getPercentElapsedTime()))));
+				float light = (float) (0.1f + ambiantLight * (1 - Math.sqrt(chrono.getPercentElapsedTime())));
+				if (chrono.getPercentElapsedTime() >= 1f) {
+					light = 0.1f + ambiantLight;
+					endGameNextFrame = true;
+				}
+				rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, light);
 			}
 		};
 		chronoLabel.setPosition(Gdx.graphics.getWidth() - 250f, Gdx.graphics.getHeight() - 100f);
 		hud.addActor(chronoLabel);
-		deathLabel = new Label(" ! ", labelStyle) {
+		deathLabel = new Label("0", labelStyle) {
 			@Override
 			public void act(float delta) {
 				super.act(delta);
-				setText(shadowsKilled + " ! " + (shadowsKilled + shadowsMissed));
+				setText(shadowsKilled);
 			}
 		};
 		deathLabel.setPosition(0, Gdx.graphics.getHeight() - 100f);
@@ -137,6 +151,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// cl.setStaticLight(false);
 		cl.setSoftnessLength(2f);
 		// TODO react to light intersect with shadow
+		// TODO shadow AI try to avoid light if it's to close from them.
 	}
 
 	public static float getWidthRacio() { return Gdx.graphics.getWidth() / 1920f; }
@@ -148,18 +163,28 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// ScreenUtils.clear(0, 0, 1, 1);
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		if (endGameNextFrame) {
+			endGame();
+			endGameNextFrame = false;
+		}
 		if (stage1 != null) {
 			stage1.act();
 			stage1.draw();
-		} else if (stage2 != null) {
+		}
+		if (stage2 != null) {
 			stage2.act();
 			stage2.draw();
 		}
-		world.step(1 / 60f, 6, 2);
-		debugRenderer.render(world, camera.combined);
+		if (world != null) {
+			world.step(1 / 60f, 6, 2);
+			debugRenderer.render(world, camera.combined);
+		}
 
-		rayHandler.setCombinedMatrix(stage1.getCamera().combined, 0, 0, 1, 1);
-		rayHandler.updateAndRender();
+		if (stage1 != null) {
+			rayHandler.setCombinedMatrix(stage1.getCamera().combined, 0, 0, 1, 1);
+			rayHandler.updateAndRender();
+		}
 
 		hud.act();
 		hud.draw();
@@ -182,15 +207,43 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public static Assets getAssets() { return assets; }
 
-	public static void addShadowToRemove(Shadow shadow, boolean killed) {
+	public void addShadowToRemove(Shadow shadow, boolean killed) {
 		shadowsToRemove.add(shadow);
 		if (killed) {
 			shadowsKilled++;
 			// TODO play death sound
 		} else {
 			shadowsMissed++;
+			// if() there is an item to stole from bed, stole it
+			// else lose game
+			endGameNextFrame = true;
 			// TODO play stole from bed sound
 		}
+	}
+
+	public void endGame() {
+		boolean win = chrono.isFinished();
+		stage2 = new Stage(viewport, batch);
+		Table table = new Table();
+		table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		stage2.addActor(table);
+		chrono.stop();
+		if (win) {
+			// TODO play win sound
+			table.add(new Label("You survived until sun rise!", labelStyle)).row();;
+			table.add(new Label("Click anywhere to play again", labelStyle));
+		} else {
+			// TODO play loose sound
+			// black screen
+			stage1.dispose();
+			stage1 = null;
+			world.dispose();
+			world = null;
+			table.add(new Label("You survived until " + chrono.getCurrentHour(), labelStyle)).row();;
+			table.add(new Label("Click anywhere to retry", labelStyle));
+		}
+		// TODO if user click anywhere it should restart the game
+
 	}
 
 }

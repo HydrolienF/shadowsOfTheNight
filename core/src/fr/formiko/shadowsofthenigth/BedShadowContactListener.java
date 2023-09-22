@@ -19,7 +19,7 @@ public class BedShadowContactListener implements ContactListener {
         }
 
         if (shadow != null) {
-            ShadowsOfTheNight.addShadowToRemove(shadow, false);
+            ShadowsOfTheNight.game.addShadowToRemove(shadow, false);
         }
     }
 
