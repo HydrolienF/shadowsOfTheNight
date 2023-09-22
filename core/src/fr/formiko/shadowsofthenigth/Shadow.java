@@ -107,4 +107,11 @@ public class Shadow extends SActor {
         super.setPosition(x, y);
         body.setTransform(x, y, 0);
     }
+
+    @Override
+    public boolean remove() {
+        super.remove();
+        ShadowsOfTheNight.world.destroyBody(body);
+        return true;
+    }
 }

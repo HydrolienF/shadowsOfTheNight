@@ -18,6 +18,8 @@ public class Musics {
     private static Music dialog;
     private static float musicsVolume = 1f;
 
+    private Musics() {}
+
     public static float getMusicsVolume() { return musicsVolume; }
     public static void setMusicsVolume(float musicsVolume) { Musics.musicsVolume = musicsVolume; }
     // public static Music getMusic() { return music; }

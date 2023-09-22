@@ -1,3 +1,10 @@
+fonts/bloody.fnt
+fonts/bloody1.png
+fonts/bloody2.png
+fonts/dominican.fnt
+fonts/dominican.png
+fonts/youmurderer.fnt
+fonts/youmurderer.png
 images/MainImage.png
 images/null.png
 images/spine/Frenchzebutt/Frenchzebutt.atlas
