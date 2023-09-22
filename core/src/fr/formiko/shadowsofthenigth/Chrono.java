@@ -16,7 +16,7 @@ public class Chrono {
     }
 
     public long getElapsedTime() { return System.currentTimeMillis() - startTime; }
-    public float getPercentElapsedTime() { return (float) getElapsedTime() / (float) durationInMs; }
+    public float getPercentElapsedTime() { return Math.min((float) getElapsedTime() / (float) durationInMs, 1f); }
     public boolean isFinished() { return getElapsedTime() >= durationInMs; }
     public int getStartHour() { return startHour; }
     public int getEndHour() { return endHour; }

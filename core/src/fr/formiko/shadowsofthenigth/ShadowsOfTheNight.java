@@ -97,12 +97,15 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		world.setContactListener(new BedShadowContactListener());
 
 		hud = new Stage(viewport, batch);
-		chrono = new Chrono(5 * 60 * 1000, 20, 7);
+		int minOfGame = 1; // TODO swap to 5.
+		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
 			public void act(float delta) {
 				super.act(delta);
 				setText(chrono.getCurrentHour());
+				rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f,
+						(float) (0.1f + ambiantLight * (1 - Math.sqrt(chrono.getPercentElapsedTime()))));
 			}
 		};
 		chronoLabel.setPosition(Gdx.graphics.getWidth() - 250f, Gdx.graphics.getHeight() - 100f);
@@ -121,7 +124,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public void addLigth() {
 		rayHandler = new RayHandler(world);
-		rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, ambiantLight);
 		rayHandler.setBlur(true);
 		rayHandler.setBlurNum(3);
 
@@ -135,8 +137,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// cl.setStaticLight(false);
 		cl.setSoftnessLength(2f);
 		// TODO react to light intersect with shadow
-
-		// Add a light to the stage
 	}
 
 	public static float getWidthRacio() { return Gdx.graphics.getWidth() / 1920f; }
