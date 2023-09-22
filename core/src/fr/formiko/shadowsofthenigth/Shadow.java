@@ -64,6 +64,8 @@ public class Shadow extends SActor {
         super.act(delta);
         if (isPlayer) {
             applyPlayerMove(delta);
+        } else {
+            tryToReachBed(delta);
         }
         // if(delete){
         // world.destroyBody(body);
@@ -100,6 +102,10 @@ public class Shadow extends SActor {
 
         // set rotation of the body from the direction of the velocity
         body.setTransform(body.getPosition(), vel.angleRad());
+    }
+
+    private void tryToReachBed(float delta) {
+        // TODO
     }
 
     @Override

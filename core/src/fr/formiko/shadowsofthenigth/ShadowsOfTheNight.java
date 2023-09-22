@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import box2dLight.ConeLight;
 import box2dLight.RayHandler;
@@ -48,14 +51,18 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private int shadowsKilled;
 	private int shadowsMissed;
 	private boolean endGameNextFrame;
+	private InputMultiplexer inputMultiplexer;
+	private boolean playerIsShadow;
 
 
 	public ShadowsOfTheNight() { game = this; }
 
+	public void addProcessor(InputProcessor ip) { inputMultiplexer.addProcessor(ip); }
+	public void removeProcessor(InputProcessor ip) { inputMultiplexer.removeProcessor(ip); }
+
 	@Override
 	public void create() {
 		Box2D.init();
-		world = new World(new Vector2(0, 0), true);
 		debugRenderer = new Box2DDebugRenderer(); // @a
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
@@ -69,31 +76,33 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		BitmapFont nbmf = new BitmapFont(Gdx.files.internal("fonts/dominican.fnt"));
 		normalLabelStyle = new Label.LabelStyle(nbmf, Color.WHITE);
 
+		// InputProcessor inputProcessor = new InputCore(this);
+		inputMultiplexer = new InputMultiplexer();
+		// inputMultiplexer.addProcessor(inputProcessor);
+		Gdx.input.setInputProcessor(inputMultiplexer);
 
+		playerIsShadow = false;
 		playGame1();
 	}
 
+
 	public void playGame1() {
 		endGameNextFrame = false;
+		world = new World(new Vector2(0, 0), true);
 		if (stage2 != null) {
 			stage2.dispose();
+			removeProcessor(stage2);
 			stage2 = null;
 		}
 		shadowsKilled = 0;
 		shadowsMissed = 0;
 		stage1 = new Stage(viewport, batch);
+		addProcessor(stage1);
 		Image backgroundImage = new Image(new Texture("images/MainImage.png"));
 		backgroundImage.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage1.addActor(backgroundImage);
 		shadows = new LinkedList<>();
-		for (int i = 0; i < 1; i++) {
-			Shadow shadow = new Shadow();
-			shadow.setScale(0.1f);
-			shadow.setPosition(Gdx.graphics.getWidth() - 100 * getWidthRacio(), 100 * getHeightRacio());
-			shadows.add(shadow);
-			stage1.addActor(shadow);
-			shadow.isPlayer = true;
-		}
+		spawnAShadow();
 		stage1.addActor(new Obstacle("wall", 0, 0, Gdx.graphics.getWidth(), 10));
 		// stage1.addActor(new Obstacle("wall", Gdx.graphics.getHeight() - 10, Gdx.graphics.getWidth(), 10, 0));
 		stage1.addActor(new Obstacle("wall", 0, 0, 10, Gdx.graphics.getHeight()));
@@ -133,7 +142,15 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		};
 		deathLabel.setPosition(0, Gdx.graphics.getHeight() - 100f);
 		hud.addActor(deathLabel);
+	}
 
+	public void spawnAShadow() {
+		Shadow shadow = new Shadow();
+		shadow.setScale(0.1f);
+		shadow.setPosition(Gdx.graphics.getWidth() - 100 * getWidthRacio(), 100 * getHeightRacio());
+		shadows.add(shadow);
+		stage1.addActor(shadow);
+		shadow.isPlayer = playerIsShadow;
 	}
 
 	public void addLigth() {
@@ -227,23 +244,28 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		Table table = new Table();
 		table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage2.addActor(table);
+		addProcessor(stage2);
 		chrono.stop();
 		if (win) {
 			// TODO play win sound
-			table.add(new Label("You survived until sun rise!", labelStyle)).row();;
-			table.add(new Label("Click anywhere to play again", labelStyle));
+			table.add(new Label("You survived until sun rise!", labelStyle)).row();
+			table.add(new Label("Click here to play again", labelStyle)); // to play as shadow
 		} else {
 			// TODO play loose sound
 			// black screen
 			stage1.dispose();
+			removeProcessor(stage1);
 			stage1 = null;
 			world.dispose();
 			world = null;
-			table.add(new Label("You survived until " + chrono.getCurrentHour(), labelStyle)).row();;
-			table.add(new Label("Click anywhere to retry", labelStyle));
+			table.add(new Label("You survived until " + chrono.getCurrentHour(), labelStyle)).row();
+			table.add(new Label("Click here to retry", labelStyle));
 		}
-		// TODO if user click anywhere it should restart the game
-
+		// TODO if user click !anywhere! it should restart the game
+		table.addListener(new ClickListener() {
+			@Override
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) { playGame1(); }
+		});
 	}
 
 }
