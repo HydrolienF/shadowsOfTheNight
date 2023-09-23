@@ -1,6 +1,7 @@
 package fr.formiko.shadowsofthenigth;
 
 import fr.formiko.shadowsofthenigth.tools.Assets;
+import fr.formiko.shadowsofthenigth.tools.Musics;
 import java.util.LinkedList;
 import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -26,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import box2dLight.ConeLight;
+import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
 public class ShadowsOfTheNight extends ApplicationAdapter {
@@ -39,7 +41,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public static World world;
 	private Box2DDebugRenderer debugRenderer;
 	private RayHandler rayHandler;
-	private float ambiantLight = 0.4f;
+	private float ambiantLight = 0.2f;
 	public static ShadowsOfTheNight game;
 	private static List<Shadow> shadowsToRemove = new LinkedList<>();
 	public static Chrono chrono;
@@ -48,6 +50,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private static LabelStyle labelStyle;
 	private static LabelStyle labelStyle40;
 	private Stage hud;
+	private Stage menuStage;
 	private int shadowsKilled;
 	private int shadowsMissed;
 	private boolean endGameNextFrame;
@@ -83,15 +86,16 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// inputMultiplexer.addProcessor(inputProcessor);
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
-		playerIsShadow = true; // TDOD swap to false
-		playGame1();
+		// playerIsShadow = false; // TDOD swap to false
+		displayMenu();
+		// playGame1();
 	}
 
 
-	public void playGame1() {
+	public void playGame1(boolean start) {
 		endGameNextFrame = false;
 		world = new World(new Vector2(0, 0), true);
-		if (stage2 != null) {
+		if (stage2 != null && start) {
 			stage2.dispose();
 			removeProcessor(stage2);
 			stage2 = null;
@@ -105,24 +109,37 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		backgroundImage.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage1.addActor(backgroundImage);
 		shadows = new LinkedList<>();
-		spawnAShadow();
 
 		// walls
-		stage1.addActor(new Obstacle(0, 0, Gdx.graphics.getWidth(), 120 * getHeightRacio()));
-		stage1.addActor(
-				new Obstacle(0, Gdx.graphics.getHeight() - (120 * getHeightRacio()), Gdx.graphics.getWidth(), 120 * getHeightRacio()));
-		stage1.addActor(new Obstacle(0, 0, 120 * getWidthRacio(), Gdx.graphics.getHeight()));
-		stage1.addActor(
-				new Obstacle(Gdx.graphics.getWidth() - (135 * getWidthRacio()), 0, 135 * getWidthRacio(), Gdx.graphics.getHeight()));
+		if (start) {
+			stage1.addActor(new Obstacle(0, 0, Gdx.graphics.getWidth(), 120 * getHeightRacio()));
+			stage1.addActor(
+					new Obstacle(0, Gdx.graphics.getHeight() - (120 * getHeightRacio()), Gdx.graphics.getWidth(), 120 * getHeightRacio()));
+			stage1.addActor(new Obstacle(0, 0, 120 * getWidthRacio(), Gdx.graphics.getHeight()));
+			stage1.addActor(
+					new Obstacle(Gdx.graphics.getWidth() - (135 * getWidthRacio()), 0, 135 * getWidthRacio(), Gdx.graphics.getHeight()));
+		}
 
 		// meubles
 
-		bed = new Bed(50 * getWidthRacio(), 400 * getHeightRacio(), 450 * getWidthRacio(), 260 * getHeightRacio());
-		stage1.addActor(bed);
+		if (start) {
+			bed = new Bed(50 * getWidthRacio(), 400 * getHeightRacio(), 450 * getWidthRacio(), 260 * getHeightRacio());
+			stage1.addActor(bed);
+		}
 
-		addLigth();
-		world.setContactListener(new BedShadowContactListener());
+		addLigth(start);
 
+		if (start) {
+			world.setContactListener(new BedShadowContactListener());
+			Musics.playGameMusic();
+
+			spawnAShadow();
+			addHud();
+		}
+	}
+	public void playGame1() { playGame1(true); }
+
+	public void addHud() {
 		hud = new Stage(viewport, batch);
 		int minOfGame = 8;
 		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
@@ -138,6 +155,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				}
 				// light = 0.1f; // @a
 				rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, light);
+
+				// TODO respawn more shadow depending on the time
 			}
 		};
 		chronoLabel.setPosition(Gdx.graphics.getWidth() - 250f, Gdx.graphics.getHeight() - 100f);
@@ -154,7 +173,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	}
 
 	public void spawnAShadow() {
-		Shadow shadow = new Shadow();
+		Shadow shadow = new Shadow(500);
 		shadow.setScale(0.1f);
 		shadow.setPosition(Gdx.graphics.getWidth() - 100 * getWidthRacio(), 100 * getHeightRacio());
 		shadows.add(shadow);
@@ -162,7 +181,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		shadow.isPlayer = playerIsShadow;
 	}
 
-	public void addLigth() {
+	public void addLigth(boolean start) {
 		rayHandler = new RayHandler(world);
 		rayHandler.setBlur(true);
 		rayHandler.setBlurNum(3);
@@ -170,14 +189,25 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		rayHandler.setShadows(true);
 		// pl.setStaticLight(false);
 		// pl.setSoft(true);
-		ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
-		cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
-		cl.setActive(true);
-		cl.setSoft(true);
-		// cl.setStaticLight(false);
-		cl.setSoftnessLength(2f);
-		// TODO react to light intersect with shadow
-		// TODO shadow AI try to avoid light if it's to close from them.
+		if (start) {
+			ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
+			cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
+			cl.setActive(true);
+			cl.setSoft(true);
+			// cl.setStaticLight(false);
+			cl.setSoftnessLength(2f);
+			// TODO react to light intersect with shadow
+			// TODO shadow AI try to avoid light if it's to close from them.
+		} else {
+			PointLight p1 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 2000, 0, 0);
+			// p1.setPosition(Gdx.graphics.getWidth() - (200 * getWidthRacio()), 200 * getHeightRacio());
+			p1.setPosition(1700 * getWidthRacio(), 200 * getHeightRacio());
+			// p1.setActive(true);
+			PointLight p2 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 500, 0, 0);
+			p2.setPosition(120 * getWidthRacio(), 350 * getHeightRacio());
+
+			rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, 0.2f);
+		}
 	}
 
 	public static float getWidthRacio() { return Gdx.graphics.getWidth() / 1920f; }
@@ -214,8 +244,14 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			rayHandler.updateAndRender();
 		}
 
-		hud.act();
-		hud.draw();
+		if (hud != null) {
+			hud.act();
+			hud.draw();
+		}
+		if (menuStage != null) {
+			menuStage.act();
+			menuStage.draw();
+		}
 
 		for (Shadow shadow : shadowsToRemove) {
 			shadow.remove();
@@ -243,7 +279,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		shadowsToRemove.add(shadow);
 		if (killed) {
 			shadowsKilled++;
-			// TODO play death sound
+			Musics.playSound("12 light_on_ghost");
 		} else {
 			shadowsMissed++;
 			// if() there is an item to stole from bed, stole it
@@ -252,11 +288,12 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			if (toysLeft <= 0) {
 				endGameNextFrame = true;
 			}
-			// TODO play stole from bed sound
+			Musics.playSound("toy stolen");
 		}
 	}
 
 	public void endGame() {
+		Musics.play("16 death_sound");
 		boolean boyWin = chrono.isFinished();
 		stage2 = new Stage(viewport, batch);
 		Table table = new Table();
@@ -278,7 +315,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				endText = "You managed to steal all toys and the flashlight from the boy!\n This family should leave your haunted house soon!";
 
 			} else {
-				endText = "You survived until " + chrono.getCurrentHour();
+				endText = "You survived until " + chrono.getCurrentHour() + ".\n Mom was wrong, shadows eat children!";
 			}
 			// black screen
 			stage1.dispose();
@@ -288,10 +325,10 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			world = null;
 		}
 		if (playerIsShadow) {
-			playAsShadowText = "Click here to retry";
+			playAsShadowText = "Click HERE to retry";
 			playAsBoyText = "Click here to play as boy";
 		} else {
-			playAsShadowText = "Click here to play as shadow";
+			playAsShadowText = "Click HERE to play as shadow";
 			playAsBoyText = "Click here to retry";
 		}
 		table.add(new Label(endText, labelStyle40)).row();
@@ -313,6 +350,49 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			}
 		});
 		table.add(playAsBoy).row();
+	}
+
+	public void displayMenu() {
+		Musics.play("01 Haunting Shadows (Menu)");
+		menuStage = new Stage(viewport, batch);
+
+		Table table = new Table();
+		table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		menuStage.addActor(table);
+		addProcessor(menuStage);
+		table.add(new Label("Mom: Good night my little knight.", labelStyle40)).row();
+		table.add(new Label("Boy: Mom I can't sleep, there is the same shadows that kill Lili.", labelStyle40)).row();
+		table.add(new Label("Mom: Shadows don't eat children. Your sister is studying in Poland.", labelStyle40)).row();
+		table.add(new Label("Mom: Don't worry, I checked under your bed.", labelStyle40)).row();
+		table.add(new Label("Mom: If you see something just turn your light on for a minute.", labelStyle40)).row();
+		table.add(new Label(" ", labelStyle40)).row();
+
+
+		Label playAsShadow = new Label("Click HERE to play as the boy", labelStyle40);
+		playAsShadow.addListener(new ClickListener() {
+			@Override
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+				menuStage.clear();
+				menuStage = null;
+				playerIsShadow = false;
+				playGame1();
+			}
+		});
+		table.add(playAsShadow).row();
+		Label playAsBoy = new Label("Click HERE to play as a shadow", labelStyle40);
+		playAsBoy.addListener(new ClickListener() {
+			@Override
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+				menuStage.clear();
+				menuStage = null;
+				playerIsShadow = true;
+				playGame1();
+			}
+		});
+		table.add(playAsBoy).row();
+		table.add(new Label("(Use arrows to move)", labelStyle40)).row();
+
+		playGame1(false);
 	}
 
 }

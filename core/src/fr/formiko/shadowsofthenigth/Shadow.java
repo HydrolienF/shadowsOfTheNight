@@ -17,9 +17,12 @@ public class Shadow extends SActor {
     public boolean isPlayer;
     public static final float MAX_VELOCITY = 20000f;
     public static final float MAX_INPULSE = 5000f;
+    Vector2 targetedPos;
+    private int visionRadius;
 
-    public Shadow() {
+    public Shadow(int visionRadius) {
         super("shadow");
+        this.visionRadius = visionRadius;
         bodyColor = new Color(0, 0, 0, 0.7f);
         Slot colorSlot = getSkeleton().findSlot("shadow");
         colorSlot.getColor().set(bodyColor);
@@ -105,24 +108,35 @@ public class Shadow extends SActor {
     }
 
     private void tryToReachBed(float delta) {
-        // TODO
         Bed bed = ShadowsOfTheNight.game.bed;
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
-        Vector2 targetedPos = bed.body.getPosition();
+        if (pos.dst(bed.body.getPosition()) < visionRadius) {
+            targetedPos = bed.body.getPosition();
+        } else if (targetedPos == null) { // when it hit an obstacle targetedPos is set to null
+            targetedPos = getRandomPosOutsideOfObstacle();
+        } else if (pos.dst(targetedPos) < 100) { // when it reach the targetedPos, get a new one
+            targetedPos = getRandomPosOutsideOfObstacle();
+        }
         // TODO avoid light
-        // Vector2 toAvoidPos =
 
-        float distance = pos.dst(targetedPos);
         body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
 
 
         // float racio = delta * 60f;
 
-
         // set rotation of the body from the direction of the velocity
         body.setTransform(body.getPosition(), vel.angleRad());
+    }
 
+    private Vector2 getRandomPosOutsideOfObstacle() {
+        // while (true) {
+        // Vector2 randomPos = new Vector2(MathUtils.random(0, Gdx.graphics.getWidth()), MathUtils.random(0, Gdx.graphics.getHeight()));
+        // // TODO if is outside of an obstacle
+        // // for ()
+        // return randomPos;
+        // }
+        return new Vector2(MathUtils.random(120, Gdx.graphics.getWidth() - 120), MathUtils.random(120, Gdx.graphics.getHeight() - 120));
     }
 
     @Override

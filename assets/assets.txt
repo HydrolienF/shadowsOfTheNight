@@ -28,5 +28,6 @@ musics/11 howling_wind.mp3
 musics/12 light_on_ghost.mp3
 musics/13 start_game_button.mp3
 musics/14 ghost_close.mp3
-musics/15 ghost_close_v2.mp3
 musics/16 death_sound.mp3
+musics/game.mp3
+musics/toy stolen.mp3

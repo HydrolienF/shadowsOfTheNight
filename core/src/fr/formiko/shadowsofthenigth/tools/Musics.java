@@ -2,6 +2,7 @@ package fr.formiko.shadowsofthenigth.tools;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 
 /**
@@ -157,5 +158,20 @@ public class Musics {
     public static void playDialog(String fileName) {
         setMusicDialog(fileName);
         playDialog();
+    }
+
+    public static void playGameMusic() {
+        play("game");
+        // setVolume(0.4f);
+        setLooping(true);
+    }
+
+    public static void playSound(String fileName) {
+        try {
+            Sound sound = Gdx.audio.newSound(Gdx.files.internal("musics/" + fileName + ".mp3"));
+            sound.play();
+        } catch (Exception e) {
+            System.out.println("Sound file not found : " + fileName);
+        }
     }
 }

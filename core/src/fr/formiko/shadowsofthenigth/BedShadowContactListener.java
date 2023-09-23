@@ -21,6 +21,12 @@ public class BedShadowContactListener implements ContactListener {
         if (shadow != null) {
             ShadowsOfTheNight.game.addShadowToRemove(shadow, false);
         }
+
+        if (contact.getFixtureA().getBody().getUserData() instanceof Shadow
+                && contact.getFixtureB().getBody().getUserData() instanceof Obstacle) {
+            shadow = (Shadow) contact.getFixtureA().getBody().getUserData();
+            shadow.targetedPos = null;
+        }
     }
 
     @Override
