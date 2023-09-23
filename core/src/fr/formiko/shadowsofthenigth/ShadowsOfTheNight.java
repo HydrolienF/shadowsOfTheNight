@@ -46,13 +46,15 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private Label chronoLabel;
 	private Label deathLabel;
 	private static LabelStyle labelStyle;
-	private static LabelStyle normalLabelStyle;
+	private static LabelStyle labelStyle40;
 	private Stage hud;
 	private int shadowsKilled;
 	private int shadowsMissed;
 	private boolean endGameNextFrame;
 	private InputMultiplexer inputMultiplexer;
 	private boolean playerIsShadow;
+	public Bed bed;
+	private int toysLeft;
 
 
 	public ShadowsOfTheNight() { game = this; }
@@ -73,15 +75,15 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 		BitmapFont bmf = new BitmapFont(Gdx.files.internal("fonts/bloody.fnt"));
 		labelStyle = new Label.LabelStyle(bmf, Color.WHITE);
-		BitmapFont nbmf = new BitmapFont(Gdx.files.internal("fonts/dominican.fnt"));
-		normalLabelStyle = new Label.LabelStyle(nbmf, Color.WHITE);
+		BitmapFont nbmf = new BitmapFont(Gdx.files.internal("fonts/bloody40.fnt"));
+		labelStyle40 = new Label.LabelStyle(nbmf, Color.WHITE);
 
 		// InputProcessor inputProcessor = new InputCore(this);
 		inputMultiplexer = new InputMultiplexer();
 		// inputMultiplexer.addProcessor(inputProcessor);
 		Gdx.input.setInputProcessor(inputMultiplexer);
 
-		playerIsShadow = false;
+		playerIsShadow = true; // TDOD swap to false
 		playGame1();
 	}
 
@@ -96,6 +98,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		}
 		shadowsKilled = 0;
 		shadowsMissed = 0;
+		toysLeft = 5;
 		stage1 = new Stage(viewport, batch);
 		addProcessor(stage1);
 		Image backgroundImage = new Image(new Texture("images/MainImage.png"));
@@ -103,20 +106,25 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		stage1.addActor(backgroundImage);
 		shadows = new LinkedList<>();
 		spawnAShadow();
-		stage1.addActor(new Obstacle("wall", 0, 0, Gdx.graphics.getWidth(), 10));
-		// stage1.addActor(new Obstacle("wall", Gdx.graphics.getHeight() - 10, Gdx.graphics.getWidth(), 10, 0));
-		stage1.addActor(new Obstacle("wall", 0, 0, 10, Gdx.graphics.getHeight()));
-		stage1.addActor(new Obstacle("wall", Gdx.graphics.getWidth() - 10, 0, 10, Gdx.graphics.getHeight()));
-		stage1.addActor(new Obstacle(600 * getWidthRacio(), Gdx.graphics.getHeight() - 170 * getHeightRacio(), 500 * getWidthRacio(),
-				170 * getHeightRacio()));
-		stage1.addActor(new Obstacle(650 * getWidthRacio(), 320 * getHeightRacio(), 150 * getWidthRacio(), 150 * getHeightRacio()));
-		stage1.addActor(new Bed(0, 300 * getHeightRacio(), 300 * getWidthRacio(), 500 * getHeightRacio()));
+
+		// walls
+		stage1.addActor(new Obstacle(0, 0, Gdx.graphics.getWidth(), 120 * getHeightRacio()));
+		stage1.addActor(
+				new Obstacle(0, Gdx.graphics.getHeight() - (120 * getHeightRacio()), Gdx.graphics.getWidth(), 120 * getHeightRacio()));
+		stage1.addActor(new Obstacle(0, 0, 120 * getWidthRacio(), Gdx.graphics.getHeight()));
+		stage1.addActor(
+				new Obstacle(Gdx.graphics.getWidth() - (135 * getWidthRacio()), 0, 135 * getWidthRacio(), Gdx.graphics.getHeight()));
+
+		// meubles
+
+		bed = new Bed(50 * getWidthRacio(), 400 * getHeightRacio(), 450 * getWidthRacio(), 260 * getHeightRacio());
+		stage1.addActor(bed);
 
 		addLigth();
 		world.setContactListener(new BedShadowContactListener());
 
 		hud = new Stage(viewport, batch);
-		int minOfGame = 10; // TODO swap to 5.
+		int minOfGame = 8;
 		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
@@ -128,6 +136,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 					light = 0.1f + ambiantLight;
 					endGameNextFrame = true;
 				}
+				// light = 0.1f; // @a
 				rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, light);
 			}
 		};
@@ -137,7 +146,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			@Override
 			public void act(float delta) {
 				super.act(delta);
-				setText(shadowsKilled);
+				setText(toysLeft + " toys left");
 			}
 		};
 		deathLabel.setPosition(0, Gdx.graphics.getHeight() - 100f);
@@ -161,8 +170,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		rayHandler.setShadows(true);
 		// pl.setStaticLight(false);
 		// pl.setSoft(true);
-		ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 10000, 0, 0, 0, 4);
-		cl.setPosition(50 * getWidthRacio(), 500 * getHeightRacio());
+		ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
+		cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
 		cl.setActive(true);
 		cl.setSoft(true);
 		// cl.setStaticLight(false);
@@ -195,7 +204,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		}
 		if (world != null) {
 			world.step(1 / 60f, 6, 2);
-			debugRenderer.render(world, camera.combined);
+			if (debugRenderer != null) {
+				debugRenderer.render(world, camera.combined);
+			}
 		}
 
 		if (stage1 != null) {
@@ -208,7 +219,11 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 		for (Shadow shadow : shadowsToRemove) {
 			shadow.remove();
+			shadows.remove(shadow);
 			Gdx.app.log("BedShadowContactListener", "Shadow removed");
+			if (shadow.isPlayer || shadows.isEmpty()) {
+				spawnAShadow();
+			}
 		}
 		shadowsToRemove.clear();
 	}
@@ -233,39 +248,71 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			shadowsMissed++;
 			// if() there is an item to stole from bed, stole it
 			// else lose game
-			endGameNextFrame = true;
+			toysLeft--;
+			if (toysLeft <= 0) {
+				endGameNextFrame = true;
+			}
 			// TODO play stole from bed sound
 		}
 	}
 
 	public void endGame() {
-		boolean win = chrono.isFinished();
+		boolean boyWin = chrono.isFinished();
 		stage2 = new Stage(viewport, batch);
 		Table table = new Table();
 		table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage2.addActor(table);
 		addProcessor(stage2);
 		chrono.stop();
-		if (win) {
-			// TODO play win sound
-			table.add(new Label("You survived until sun rise!", labelStyle)).row();
-			table.add(new Label("Click here to play again", labelStyle)); // to play as shadow
+		String endText;
+		String playAsShadowText;
+		String playAsBoyText;
+		if (boyWin) {
+			if (playerIsShadow) {
+				endText = "You didn't steal enough toys! " + toysLeft + " toys left";
+			} else {
+				endText = "You survived until sun rise!";
+			}
 		} else {
-			// TODO play loose sound
+			if (playerIsShadow) {
+				endText = "You managed to steal all toys and the flashlight from the boy!\n This family should leave your haunted house soon!";
+
+			} else {
+				endText = "You survived until " + chrono.getCurrentHour();
+			}
 			// black screen
 			stage1.dispose();
 			removeProcessor(stage1);
 			stage1 = null;
 			world.dispose();
 			world = null;
-			table.add(new Label("You survived until " + chrono.getCurrentHour(), labelStyle)).row();
-			table.add(new Label("Click here to retry", labelStyle));
 		}
-		// TODO if user click !anywhere! it should restart the game
-		table.addListener(new ClickListener() {
+		if (playerIsShadow) {
+			playAsShadowText = "Click here to retry";
+			playAsBoyText = "Click here to play as boy";
+		} else {
+			playAsShadowText = "Click here to play as shadow";
+			playAsBoyText = "Click here to retry";
+		}
+		table.add(new Label(endText, labelStyle40)).row();
+		Label playAsShadow = new Label(playAsShadowText, labelStyle40);
+		playAsShadow.addListener(new ClickListener() {
 			@Override
-			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) { playGame1(); }
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+				playerIsShadow = true;
+				playGame1();
+			}
 		});
+		table.add(playAsShadow).row();
+		Label playAsBoy = new Label(playAsBoyText, labelStyle40);
+		playAsBoy.addListener(new ClickListener() {
+			@Override
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+				playerIsShadow = false;
+				playGame1();
+			}
+		});
+		table.add(playAsBoy).row();
 	}
 
 }

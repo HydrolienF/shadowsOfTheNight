@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Bed extends Image {
-    private Body body;
+    public Body body;
     public Bed(float x, float y, float width, float height) {
         super(new Texture("images/null.png"));
         createBody(x, y, width, height);

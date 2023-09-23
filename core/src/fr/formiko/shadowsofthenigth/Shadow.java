@@ -83,20 +83,20 @@ public class Shadow extends SActor {
         // body.applyForceToCenter(1.0f, 0.0f, true);
 
         // apply left impulse, but only if max velocity is not reached yet
-        if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x * racio > -MAX_VELOCITY) {
+        if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x > -MAX_VELOCITY) {
             body.applyLinearImpulse(-MAX_INPULSE * racio, 0, pos.x, pos.y, true);
         }
 
         // apply right impulse, but only if max velocity is not reached yet
-        if (Gdx.input.isKeyPressed(Keys.RIGHT) && vel.x * racio < MAX_VELOCITY) {
+        if (Gdx.input.isKeyPressed(Keys.RIGHT) && vel.x < MAX_VELOCITY) {
             body.applyLinearImpulse(MAX_INPULSE * racio, 0, pos.x, pos.y, true);
         }
 
-        if (Gdx.input.isKeyPressed(Keys.UP) && vel.y * racio < MAX_VELOCITY) {
+        if (Gdx.input.isKeyPressed(Keys.UP) && vel.y < MAX_VELOCITY) {
             body.applyLinearImpulse(0, MAX_INPULSE * racio, pos.x, pos.y, true);
         }
 
-        if (Gdx.input.isKeyPressed(Keys.DOWN) && vel.y * racio > -MAX_VELOCITY) {
+        if (Gdx.input.isKeyPressed(Keys.DOWN) && vel.y > -MAX_VELOCITY) {
             body.applyLinearImpulse(0, -MAX_INPULSE * racio, pos.x, pos.y, true);
         }
 
@@ -106,6 +106,23 @@ public class Shadow extends SActor {
 
     private void tryToReachBed(float delta) {
         // TODO
+        Bed bed = ShadowsOfTheNight.game.bed;
+        Vector2 vel = body.getLinearVelocity();
+        Vector2 pos = body.getPosition();
+        Vector2 targetedPos = bed.body.getPosition();
+        // TODO avoid light
+        // Vector2 toAvoidPos =
+
+        float distance = pos.dst(targetedPos);
+        body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
+
+
+        // float racio = delta * 60f;
+
+
+        // set rotation of the body from the direction of the velocity
+        body.setTransform(body.getPosition(), vel.angleRad());
+
     }
 
     @Override

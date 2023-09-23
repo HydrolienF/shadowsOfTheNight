@@ -12,3 +12,7 @@ Graphism: kzima97
 
 # Assets
 Font: James Fordyce !https://www.1001freefonts.com/bloody.font
+
+
+# TODO
+use normal mode color with brosse Texture "Hose 03"
