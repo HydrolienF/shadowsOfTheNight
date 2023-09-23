@@ -160,11 +160,7 @@ public class Musics {
         playDialog();
     }
 
-    public static void playGameMusic() {
-        play("game");
-        // setVolume(0.4f);
-        setLooping(true);
-    }
+    public static void playGameMusic() { play("game"); }
 
     public static void playSound(String fileName) {
         try {

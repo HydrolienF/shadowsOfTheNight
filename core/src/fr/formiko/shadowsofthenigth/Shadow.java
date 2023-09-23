@@ -1,5 +1,7 @@
 package fr.formiko.shadowsofthenigth;
 
+import java.util.LinkedList;
+import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -15,10 +17,11 @@ import com.esotericsoftware.spine.Slot;
 public class Shadow extends SActor {
     private Color bodyColor;
     public boolean isPlayer;
-    public static final float MAX_VELOCITY = 20000f;
-    public static final float MAX_INPULSE = 5000f;
+    public static final float MAX_VELOCITY = 40000f;
+    public static final float MAX_INPULSE = 10000f;
     Vector2 targetedPos;
     private int visionRadius;
+    private static final float SIZE = 40f;
 
     public Shadow(int visionRadius) {
         super("shadow");
@@ -29,6 +32,26 @@ public class Shadow extends SActor {
         getSkeleton().setSkin("bad");
         createBody();
         body.setUserData(this);
+    }
+
+    public float getRadius() { return SIZE * ShadowsOfTheNight.getWidthRacio(); }
+
+    public List<Vector2> getHitPoints() {
+        List<Vector2> hitPoints = new LinkedList<>();
+        // for (int i = 0; i < 360; i += 10) {
+        // float x = getX() + getRadius() * MathUtils.cosDeg(i);
+        // float y = getY() + getRadius() * MathUtils.sinDeg(i);
+        // hitPoints.add(new Vector2(x, y));
+        // }
+        hitPoints.add(new Vector2(getX() + getRadius(), getY()));
+        hitPoints.add(new Vector2(getX() - getRadius(), getY()));
+        hitPoints.add(new Vector2(getX(), getY() + getRadius()));
+        hitPoints.add(new Vector2(getX(), getY() - getRadius()));
+        hitPoints.add(new Vector2(getX() + getRadius(), getY() + getRadius()));
+        hitPoints.add(new Vector2(getX() - getRadius(), getY() - getRadius()));
+        hitPoints.add(new Vector2(getX() + getRadius(), getY() - getRadius()));
+        hitPoints.add(new Vector2(getX() - getRadius(), getY() + getRadius()));
+        return hitPoints;
     }
 
     public void createBody() {
@@ -45,12 +68,12 @@ public class Shadow extends SActor {
 
         // Create a circle shape and set its radius to 6
         CircleShape circle = new CircleShape();
-        circle.setRadius(40f * ShadowsOfTheNight.getWidthRacio());
+        circle.setRadius(getRadius());
 
         // Create a fixture definition to apply our shape to
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 5f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f; // Make it bounce a little bit
 
@@ -79,6 +102,8 @@ public class Shadow extends SActor {
     }
 
     public void applyPlayerMove(float delta) {
+        // TODO TOFIX move speed should be the same whatever the framerate is and same for AI and player.
+
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
         float racio = delta * 60f;
@@ -115,7 +140,7 @@ public class Shadow extends SActor {
             targetedPos = bed.body.getPosition();
         } else if (targetedPos == null) { // when it hit an obstacle targetedPos is set to null
             targetedPos = getRandomPosOutsideOfObstacle();
-        } else if (pos.dst(targetedPos) < 100) { // when it reach the targetedPos, get a new one
+        } else if (pos.dst(targetedPos) < 150) { // when it reach the targetedPos, get a new one
             targetedPos = getRandomPosOutsideOfObstacle();
         }
         // TODO avoid light

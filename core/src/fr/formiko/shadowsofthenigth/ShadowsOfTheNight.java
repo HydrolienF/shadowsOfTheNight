@@ -27,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import box2dLight.ConeLight;
+import box2dLight.Light;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
@@ -58,6 +59,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private boolean playerIsShadow;
 	public Bed bed;
 	private int toysLeft;
+	private ConeLight cl;
 
 
 	public ShadowsOfTheNight() { game = this; }
@@ -142,6 +144,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public void addHud() {
 		hud = new Stage(viewport, batch);
 		int minOfGame = 8;
+		// TODO do a 8 min long music named game.mp3
 		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
@@ -190,12 +193,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// pl.setStaticLight(false);
 		// pl.setSoft(true);
 		if (start) {
-			ConeLight cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
+			cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
 			cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
 			cl.setActive(true);
 			cl.setSoft(true);
 			// cl.setStaticLight(false);
 			cl.setSoftnessLength(2f);
+
 			// TODO react to light intersect with shadow
 			// TODO shadow AI try to avoid light if it's to close from them.
 		} else {
@@ -216,6 +220,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	@Override
 	public void render() {
+		// kill shadow with light
+		for (Shadow shadow : shadows) {
+			if (isShadowOnLight(shadow, cl)) {
+				addShadowToRemove(shadow, true);
+			}
+		}
+
 		// ScreenUtils.clear(0, 0, 1, 1);
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -262,6 +273,16 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			}
 		}
 		shadowsToRemove.clear();
+	}
+
+	public boolean isShadowOnLight(Shadow shadow, Light light) {
+		// for the 8 point over the shadow body if ligth contains that point remove shadow. N, E, S, W, NE, SE, SW, NW
+		for (Vector2 point : shadow.getHitPoints()) {
+			if (light.contains(point.x, point.y)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -354,6 +375,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public void displayMenu() {
 		Musics.play("01 Haunting Shadows (Menu)");
+		Musics.setLooping(true);
 		menuStage = new Stage(viewport, batch);
 
 		Table table = new Table();
