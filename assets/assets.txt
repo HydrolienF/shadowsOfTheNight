@@ -22,16 +22,9 @@ images/spine/shadow/shadow.png
 images/spine/shadow/skeleton.json
 images/wall.png
 musics/01 Haunting Shadows (Menu).mp3
-musics/02 Unhappy Family.mp3
-musics/03 Tension.mp3
-musics/04 The Horror is Real.mp3
-musics/05 Dreadful Night.mp3
-musics/06 Hour of the Wolf.mp3
-musics/07 Every Night Ends.mp3
 musics/08 flashlight_on.mp3
 musics/09 flashlight_off.mp3
 musics/10 game_starts.mp3
-musics/11 howling_wind.mp3
 musics/12 light_on_ghost.mp3
 musics/13 start_game_button.mp3
 musics/14 ghost_close.mp3

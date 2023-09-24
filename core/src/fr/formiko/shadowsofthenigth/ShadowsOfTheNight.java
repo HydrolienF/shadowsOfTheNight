@@ -104,6 +104,10 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 
 	public void playGame1(boolean start) {
+		if (menuStage != null && start) {
+			menuStage.dispose();
+			menuStage = null;
+		}
 		endGameNextFrame = false;
 		world = new World(new Vector2(0, 0), true);
 		if (stage2 != null && start) {
@@ -208,15 +212,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		if (start) {
 			cl = new BoyLight(rayHandler);
 			cl.setPosition(370 * getWidthRacio() / PIXEL_PER_METER, 480 * getHeightRacio() / PIXEL_PER_METER);
-
-			// TODO shadow AI try to avoid light if it's to close from them.
 		} else {
-			PointLight p1 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 2000, 0, 0);
+			PointLight p1 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 2000 / PIXEL_PER_METER, 0, 0);
 			// p1.setPosition(Gdx.graphics.getWidth() - (200 * getWidthRacio()), 200 * getHeightRacio());
-			p1.setPosition(1700 * getWidthRacio(), 200 * getHeightRacio());
+			p1.setPosition(1700 * getWidthRacio() / PIXEL_PER_METER, 200 * getHeightRacio() / PIXEL_PER_METER);
 			// p1.setActive(true);
-			PointLight p2 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 500, 0, 0);
-			p2.setPosition(120 * getWidthRacio(), 350 * getHeightRacio());
+			PointLight p2 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 500 / PIXEL_PER_METER, 0, 0);
+			p2.setPosition(120 * getWidthRacio() / PIXEL_PER_METER, 350 * getHeightRacio() / PIXEL_PER_METER);
 
 			rayHandler.setAmbientLight(0.1f, 0.01f, 0.01f, 0.2f);
 		}
@@ -270,7 +272,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			}
 		}
 
-		if (stage1 != null) {
+		if (stage1 != null || menuStage != null) {
 			rayHandler.setCombinedMatrix(camera2.combined, 0, 0, 1, 1);
 			rayHandler.updateAndRender();
 		}
