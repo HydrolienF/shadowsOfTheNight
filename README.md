@@ -7,7 +7,9 @@ Then got to `http://localhost:8080/`
 
 
 # Thanks
+
 Musics and sounds: speaking_through_electricity
+
 Graphism: kzima97
 
 # Assets
