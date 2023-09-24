@@ -35,7 +35,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public static Camera camera;
 	public static Camera camera2;
 	private ScreenViewport viewport;
-	private ScreenViewport viewport2;
 	private SpriteBatch batch;
 	private Stage stage1;
 	private Stage stage2;
@@ -250,6 +249,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			endGameNextFrame = false;
 		}
 		if (stage1 != null) {
+			if (chrono != null) {
+				spawnExtraShadow();
+			}
 			stage1.act();
 			stage1.draw();
 		}
@@ -286,7 +288,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			shadow.remove();
 			shadows.remove(shadow);
 			Gdx.app.log("BedShadowContactListener", "Shadow removed");
-			if (shadow.isPlayer || shadows.isEmpty()) {
+			if (shadow.isPlayer) { // || shadows.isEmpty()
 				spawnAShadow();
 			}
 		}
@@ -314,15 +316,17 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public static Assets getAssets() { return assets; }
 
+	private long lastPlayLightOnghost = 0;
 	public void addShadowToRemove(Shadow shadow, boolean killed) {
 		shadowsToRemove.add(shadow);
 		if (killed) {
 			shadowsKilled++;
-			Musics.playSound("12 light_on_ghost");
+			if (lastPlayLightOnghost + 100 < System.currentTimeMillis()) {
+				Musics.playSound("12 light_on_ghost");
+				lastPlayLightOnghost = System.currentTimeMillis();
+			}
 		} else {
 			shadowsMissed++;
-			// if() there is an item to stole from bed, stole it
-			// else lose game
 			toysLeft--;
 			if (toysLeft <= 0) {
 				endGameNextFrame = true;
@@ -332,6 +336,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	}
 
 	public void endGame() {
+		if (stage1 == null) {
+			return;
+		}
 		Musics.play("16 death_sound");
 		boolean boyWin = chrono.isFinished();
 		stage2 = new Stage(viewport, batch);
@@ -360,8 +367,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			stage1.dispose();
 			removeProcessor(stage1);
 			stage1 = null;
-			world.dispose();
-			world = null;
 		}
 		if (playerIsShadow) {
 			playAsShadowText = "Click HERE to retry";
@@ -433,6 +438,17 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		table.add(new Label("(Use arrows to move)", labelStyle40)).row();
 
 		playGame1(false);
+	}
+
+	private float lastPercentSpawnExtraShadow = 0;
+	private float spawnEachXPercent = 0.0003f;
+	private void spawnExtraShadow() {
+		if (lastPercentSpawnExtraShadow + spawnEachXPercent < Math.pow(chrono.getPercentElapsedTime(), 2)) {
+			System.out.println(
+					"spawn extra shadow at " + chrono.getPercentElapsedTime() + " (" + Math.pow(chrono.getPercentElapsedTime(), 2) + ")");
+			lastPercentSpawnExtraShadow += spawnEachXPercent;
+			spawnAShadow();
+		}
 	}
 
 }

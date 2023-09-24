@@ -37,11 +37,6 @@ public class Shadow extends SActor {
 
     public List<Vector2> getHitPoints() {
         List<Vector2> hitPoints = new LinkedList<>();
-        // for (int i = 0; i < 360; i += 10) {
-        // float x = getX() + getRadius() * MathUtils.cosDeg(i);
-        // float y = getY() + getRadius() * MathUtils.sinDeg(i);
-        // hitPoints.add(new Vector2(x, y));
-        // }
         hitPoints.add(new Vector2(body.getPosition().x + getRadius(), body.getPosition().y));
         hitPoints.add(new Vector2(body.getPosition().x - getRadius(), body.getPosition().y));
         hitPoints.add(new Vector2(body.getPosition().x, body.getPosition().y + getRadius()));
@@ -127,8 +122,9 @@ public class Shadow extends SActor {
     }
 
     private void tryToReachBed(float delta) {
-        float aiMaxVelocity = MAX_VELOCITY * (0.2f + ShadowsOfTheNight.chrono.getPercentElapsedTime());
-        float aiMaxInpulse = MAX_INPULSE * (0.2f + ShadowsOfTheNight.chrono.getPercentElapsedTime());
+        float multiplier = 0.2f + 3 * ShadowsOfTheNight.chrono.getPercentElapsedTime();
+        float aiMaxVelocity = MAX_VELOCITY * multiplier;
+        float aiMaxInpulse = MAX_INPULSE * multiplier;
 
         Bed bed = ShadowsOfTheNight.game.bed;
         Vector2 vel = body.getLinearVelocity();
@@ -142,12 +138,13 @@ public class Shadow extends SActor {
             System.out.println("reach target");
             targetedPos = getRandomPosOutsideOfObstacle();
             // if it will reach light in 100 pixels, get a new target position
-        } else if (ShadowsOfTheNight.game.cl.contains(body.getPosition().x + vel.x * 300 / ShadowsOfTheNight.PIXEL_PER_METER,
-                body.getPosition().y + vel.y * 100 / ShadowsOfTheNight.PIXEL_PER_METER)) {
-            System.out.println("will hit light");
-            targetedPos = getRandomPosOutsideOfObstacle();
         }
         // TODO avoid light
+        // else if (ShadowsOfTheNight.game.cl.contains(body.getPosition().x + vel.x * 300 / ShadowsOfTheNight.PIXEL_PER_METER,
+        // body.getPosition().y + vel.y * 100 / ShadowsOfTheNight.PIXEL_PER_METER)) {
+        // System.out.println("will hit light");
+        // targetedPos = getRandomPosOutsideOfObstacle();
+        // }
 
         // body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
         // if (vel.len() < MAX_VELOCITY) {
@@ -160,7 +157,6 @@ public class Shadow extends SActor {
         body.applyForceToCenter(aiMaxInpulse * vx, aiMaxInpulse * vy, true);
 
         if (vel.len() > aiMaxVelocity) {
-            System.out.println("max velocity reached");
             body.applyForceToCenter(vel.x * -1, vel.y * -1, true);
         }
 
