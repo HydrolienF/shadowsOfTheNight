@@ -59,7 +59,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private InputMultiplexer inputMultiplexer;
 	private boolean playerIsShadow;
 	public Bed bed;
-	private int toysLeft;
+	public int toysAtStart = 5;
+	public int toysLeft;
 	public BoyLight cl;
 	public static float TIME_STEP = 1 / 60f;
 	public static float PIXEL_PER_METER = 100f;
@@ -116,7 +117,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		}
 		shadowsKilled = 0;
 		shadowsMissed = 0;
-		toysLeft = 5;
+		toysLeft = toysAtStart;
 		stage1 = new Stage(viewport, batch);
 		addProcessor(stage1);
 		Image backgroundImage = new Image(new Texture("images/MainImage.png"));
@@ -206,7 +207,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// pl.setSoft(true);
 		if (start) {
 			cl = new BoyLight(rayHandler);
-			cl.setPosition(350 * getWidthRacio() / PIXEL_PER_METER, 480 * getHeightRacio() / PIXEL_PER_METER);
+			cl.setPosition(370 * getWidthRacio() / PIXEL_PER_METER, 480 * getHeightRacio() / PIXEL_PER_METER);
 
 			// TODO shadow AI try to avoid light if it's to close from them.
 		} else {
