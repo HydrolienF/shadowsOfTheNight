@@ -102,14 +102,8 @@ public class Shadow extends SActor {
     }
 
     public void applyPlayerMove(float delta) {
-        // TODO TOFIX move speed should be the same whatever the framerate is and same for AI and player.
-
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
-
-        // float racio = delta * 60f;
-        // TODO TOFIX shadow should move with same speed whatever the framerate is
-        // body.applyForceToCenter(1.0f, 0.0f, true);
 
         // apply left impulse, but only if max velocity is not reached yet
         if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x > -MAX_VELOCITY) {

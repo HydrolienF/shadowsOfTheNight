@@ -225,8 +225,10 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public static float getHeightRacio() { return Gdx.graphics.getHeight() / 1080f; }
 
+	float timeForNextMove = 0;
 	@Override
 	public void render() {
+		float delta = Gdx.graphics.getDeltaTime();
 		// kill shadow with light
 		for (Shadow shadow : shadows) {
 			if (isShadowOnLight(shadow, cl)) {
@@ -254,7 +256,11 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			stage2.draw();
 		}
 		if (world != null) {
-			world.step(TIME_STEP, 6, 2);
+			timeForNextMove += delta;
+			while (timeForNextMove > ShadowsOfTheNight.TIME_STEP) {
+				timeForNextMove -= ShadowsOfTheNight.TIME_STEP;
+				world.step(TIME_STEP, 6, 2);
+			}
 			if (debugRenderer != null) {
 				debugRenderer.render(world, camera2.combined);
 			}

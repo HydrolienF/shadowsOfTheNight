@@ -7,7 +7,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 public class DesktopLauncher {
 	public static void main(String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
+		config.setForegroundFPS(-1);
+		config.useVsync(true);
 		config.setTitle("Shadows of the night");
 		config.setMaximized(true);
 		// config.setWindowIcon("images/icon.png");
