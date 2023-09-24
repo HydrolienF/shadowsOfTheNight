@@ -76,7 +76,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	@Override
 	public void create() {
 		Box2D.init();
-		debugRenderer = new Box2DDebugRenderer(); // @a
+		// debugRenderer = new Box2DDebugRenderer(); // @a
 		camera = new OrthographicCamera();
 		camera2 = new OrthographicCamera(Gdx.graphics.getWidth() / PIXEL_PER_METER, Gdx.graphics.getHeight() / PIXEL_PER_METER);
 		camera2.position.set(camera2.viewportWidth / 2f, camera2.viewportHeight / 2f, 0);
@@ -158,7 +158,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		hud = new Stage(viewport, batch);
 		float minOfGame = 5f;
 		// TODO do a x min long music named game.mp3 with all game music.
-		chrono = new Chrono((int) (minOfGame * 60 * 1000), 20, 7);
+		chrono = new Chrono(((4 * 60) + 50) * 1000l, 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
 			public void act(float delta) {
@@ -420,6 +420,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				menuStage.clear();
 				menuStage = null;
 				playerIsShadow = false;
+				Musics.playSound("09 flashlight_off");
 				playGame1();
 			}
 		});
@@ -431,6 +432,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				menuStage.clear();
 				menuStage = null;
 				playerIsShadow = true;
+				Musics.playSound("09 flashlight_off");
 				playGame1();
 			}
 		});
