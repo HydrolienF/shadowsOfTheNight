@@ -22,13 +22,18 @@ public class Shadow extends SActor {
     private int visionRadius;
     private static final float SIZE = 30f;
 
-    public Shadow(int visionRadius) {
+    public Shadow(int visionRadius, boolean isPlayer) {
         super("shadow");
         this.visionRadius = visionRadius;
+        this.isPlayer = isPlayer;
         bodyColor = new Color(0, 0, 0, 0.7f);
         Slot colorSlot = getSkeleton().findSlot("shadow");
         colorSlot.getColor().set(bodyColor);
-        getSkeleton().setSkin("bad");
+        if (isPlayer) {
+            getSkeleton().setSkin("sad");
+        } else {
+            getSkeleton().setSkin("bad");
+        }
         createBody();
         body.setUserData(this);
     }

@@ -13,6 +13,7 @@ hs_err_pid5484.log
 hs_err_pid8932.log
 hs_err_pid9020.log
 images/MainImage.png
+images/mom.png
 images/null.png
 images/spine/Frenchzebutt/Frenchzebutt.atlas
 images/spine/Frenchzebutt/Frenchzebutt.png
@@ -20,7 +21,11 @@ images/spine/Frenchzebutt/skeleton.json
 images/spine/shadow/shadow.atlas
 images/spine/shadow/shadow.png
 images/spine/shadow/skeleton.json
-images/wall.png
+images/toy1.png
+images/toy2.png
+images/toy3.png
+images/toy4.png
+images/toy5.png
 musics/01 Haunting Shadows (Menu).mp3
 musics/08 flashlight_on.mp3
 musics/09 flashlight_off.mp3

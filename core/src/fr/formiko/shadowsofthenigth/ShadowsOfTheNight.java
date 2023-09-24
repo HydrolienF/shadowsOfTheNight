@@ -4,6 +4,7 @@ import fr.formiko.shadowsofthenigth.tools.Assets;
 import fr.formiko.shadowsofthenigth.tools.Musics;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -36,7 +37,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public static Camera camera2;
 	private ScreenViewport viewport;
 	private SpriteBatch batch;
-	private Stage stage1;
+	public Stage stage1;
 	private Stage stage2;
 	private static Assets assets;
 	private List<Shadow> shadows;
@@ -123,6 +124,11 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		Image backgroundImage = new Image(new Texture("images/MainImage.png"));
 		backgroundImage.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		stage1.addActor(backgroundImage);
+		if (!start) {
+			Image mom = new Image(new Texture("images/mom.png"));
+			mom.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			stage1.addActor(mom);
+		}
 		shadows = new LinkedList<>();
 
 		// walls
@@ -148,6 +154,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 		addLigth(start);
 
+		addToys();
+
 		if (start) {
 			world.setContactListener(new BedShadowContactListener());
 			Musics.playGameMusic();
@@ -157,6 +165,17 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		}
 	}
 	public void playGame1() { playGame1(true); }
+
+	private Stack<Image> toys = new Stack<>();
+	public void addToys() {
+		for (int i = 1; i < 6; i++) {
+			Image toy = new Image(new Texture("images/toy" + i + ".png"));
+			stage1.addActor(toy);
+			toys.push(toy);
+			toy.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		}
+	}
+	public void removeToy(int toyId) { toys.pop().remove(); }
 
 	public void addHud() {
 		hud = new Stage(viewport, batch);
@@ -193,12 +212,11 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	}
 
 	public void spawnAShadow() {
-		Shadow shadow = new Shadow(500);
+		Shadow shadow = new Shadow(500, playerIsShadow);
 		shadow.setScale(0.1f);
 		shadow.setPosition(Gdx.graphics.getWidth() - 200 * getWidthRacio(), MathUtils.random(200, 880) * getHeightRacio());
 		shadows.add(shadow);
 		stage1.addActor(shadow);
-		shadow.isPlayer = playerIsShadow;
 	}
 
 	public void addLigth(boolean start) {
@@ -251,7 +269,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			endGameNextFrame = false;
 		}
 		if (stage1 != null) {
-			if (chrono != null) {
+			if (chrono != null && !playerIsShadow) {
 				spawnExtraShadow();
 			}
 			stage1.act();
@@ -329,6 +347,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			}
 		} else {
 			shadowsMissed++;
+			removeToy(toysLeft);
 			toysLeft--;
 			if (toysLeft <= 0) {
 				endGameNextFrame = true;
@@ -405,6 +424,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 		Table table = new Table();
 		table.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setPosition(100 * getWidthRacio(), 0);
 		menuStage.addActor(table);
 		addProcessor(menuStage);
 		table.add(new Label("Mom: Good night my little knight.", labelStyle40)).row();

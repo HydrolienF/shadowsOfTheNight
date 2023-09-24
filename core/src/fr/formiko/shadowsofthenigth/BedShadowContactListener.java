@@ -9,6 +9,9 @@ public class BedShadowContactListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
+        if (ShadowsOfTheNight.game.stage1 == null) {
+            return;
+        }
         Shadow shadow = null;
         if (contact.getFixtureA().getBody().getUserData() instanceof Bed
                 && contact.getFixtureB().getBody().getUserData() instanceof Shadow) {
