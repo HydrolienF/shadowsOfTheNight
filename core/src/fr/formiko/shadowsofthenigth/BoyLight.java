@@ -1,5 +1,7 @@
 package fr.formiko.shadowsofthenigth;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import box2dLight.ConeLight;
 import box2dLight.RayHandler;
@@ -14,9 +16,13 @@ public class BoyLight extends ConeLight {
     }
 
     public void act() {
-        float maxMoveSpeed = 0.1f;
+        float maxMoveSpeed = 0.3f;
         if (ShadowsOfTheNight.game.isPlayerBoy()) {
-            // TODO move ligth from arrows keys
+            if (Gdx.input.isKeyPressed(Keys.UP)) {
+                setDirection(getDirection() + maxMoveSpeed);
+            } else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+                setDirection(getDirection() - maxMoveSpeed);
+            }
         } else {
             maxMoveSpeed = 0.05f * (1 + 2 * (ShadowsOfTheNight.game.toysAtStart - ShadowsOfTheNight.game.toysLeft));
             if (getDirection() > 90) {
@@ -24,7 +30,6 @@ public class BoyLight extends ConeLight {
             } else if (getDirection() < -90) {
                 moveUp = true;
             }
-            // TODO move as AI
             if (moveUp) {
                 setDirection(getDirection() + maxMoveSpeed);
             } else {

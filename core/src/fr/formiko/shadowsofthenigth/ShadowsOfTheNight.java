@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -191,7 +192,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public void spawnAShadow() {
 		Shadow shadow = new Shadow(500);
 		shadow.setScale(0.1f);
-		shadow.setPosition(Gdx.graphics.getWidth() - 200 * getWidthRacio(), 200 * getHeightRacio());
+		shadow.setPosition(Gdx.graphics.getWidth() - 200 * getWidthRacio(), MathUtils.random(200, 880) * getHeightRacio());
 		shadows.add(shadow);
 		stage1.addActor(shadow);
 		shadow.isPlayer = playerIsShadow;
