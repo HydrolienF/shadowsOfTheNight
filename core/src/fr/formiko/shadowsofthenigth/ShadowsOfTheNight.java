@@ -26,7 +26,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import box2dLight.ConeLight;
 import box2dLight.Light;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
@@ -59,13 +58,15 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private boolean playerIsShadow;
 	public Bed bed;
 	private int toysLeft;
-	private ConeLight cl;
+	private BoyLight cl;
 
 
 	public ShadowsOfTheNight() { game = this; }
 
 	public void addProcessor(InputProcessor ip) { inputMultiplexer.addProcessor(ip); }
 	public void removeProcessor(InputProcessor ip) { inputMultiplexer.removeProcessor(ip); }
+	public boolean isPlayerShadow() { return playerIsShadow; }
+	public boolean isPlayerBoy() { return !isPlayerShadow(); }
 
 	@Override
 	public void create() {
@@ -193,14 +194,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// pl.setStaticLight(false);
 		// pl.setSoft(true);
 		if (start) {
-			cl = new ConeLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 5000, 0, 0, 0, 2.5f);
+			cl = new BoyLight(rayHandler);
 			cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
-			cl.setActive(true);
-			cl.setSoft(true);
-			// cl.setStaticLight(false);
-			cl.setSoftnessLength(2f);
 
-			// TODO react to light intersect with shadow
 			// TODO shadow AI try to avoid light if it's to close from them.
 		} else {
 			PointLight p1 = new PointLight(rayHandler, 128, new Color(1, 250f / 255f, 204f / 255f, 0.8f), 2000, 0, 0);
@@ -226,6 +222,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				addShadowToRemove(shadow, true);
 			}
 		}
+		cl.act();
 
 		// ScreenUtils.clear(0, 0, 1, 1);
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
