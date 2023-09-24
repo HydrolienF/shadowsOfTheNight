@@ -103,7 +103,6 @@ public class Shadow extends SActor {
 
     public void applyPlayerMove(float delta) {
         Vector2 vel = body.getLinearVelocity();
-        Vector2 pos = body.getPosition();
 
         // apply left impulse, but only if max velocity is not reached yet
         if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x > -MAX_VELOCITY) {
@@ -128,6 +127,9 @@ public class Shadow extends SActor {
     }
 
     private void tryToReachBed(float delta) {
+        float aiMaxVelocity = MAX_VELOCITY * (0.2f + ShadowsOfTheNight.chrono.getPercentElapsedTime());
+        float aiMaxInpulse = MAX_INPULSE * (0.2f + ShadowsOfTheNight.chrono.getPercentElapsedTime());
+
         Bed bed = ShadowsOfTheNight.game.bed;
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
@@ -141,7 +143,7 @@ public class Shadow extends SActor {
             targetedPos = getRandomPosOutsideOfObstacle();
             // if it will reach light in 100 pixels, get a new target position
         } else if (ShadowsOfTheNight.game.cl.contains(body.getPosition().x + vel.x * 300 / ShadowsOfTheNight.PIXEL_PER_METER,
-                body.getPosition().y + vel.y * 300 / ShadowsOfTheNight.PIXEL_PER_METER)) {
+                body.getPosition().y + vel.y * 100 / ShadowsOfTheNight.PIXEL_PER_METER)) {
             System.out.println("will hit light");
             targetedPos = getRandomPosOutsideOfObstacle();
         }
@@ -149,12 +151,18 @@ public class Shadow extends SActor {
 
         // body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
         // if (vel.len() < MAX_VELOCITY) {
-        body.applyForceToCenter(MAX_INPULSE * (targetedPos.x - pos.x), MAX_INPULSE * (targetedPos.y - pos.y), true);
-        // }
+        // body.applyForceToCenter(MAX_INPULSE * (targetedPos.x - pos.x), MAX_INPULSE * (targetedPos.y - pos.y), true);
+        // Apply force to reach targetedPos
+        // calculate distance between body and targetedPos
+        float distance = pos.dst(targetedPos);
+        float vx = (targetedPos.x - pos.x) / distance;
+        float vy = (targetedPos.y - pos.y) / distance;
+        body.applyForceToCenter(aiMaxInpulse * vx, aiMaxInpulse * vy, true);
 
-        // reduce speed if it is too high
-        // if (vel.len() > MAX_VELOCITY)
-        // body.applyForceToCenter(-MAX_INPULSE * vel.x, -MAX_INPULSE * vel.y, true);
+        if (vel.len() > aiMaxVelocity) {
+            System.out.println("max velocity reached");
+            body.applyForceToCenter(vel.x * -1, vel.y * -1, true);
+        }
 
 
         // float racio = delta * 60f;
