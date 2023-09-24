@@ -65,6 +65,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public BoyLight cl;
 	public static float TIME_STEP = 1 / 60f;
 	public static float PIXEL_PER_METER = 100f;
+	private float lastPercentSpawnExtraShadow = 0;
+	private float spawnEachXPercent = 0.0003f;
 
 
 	public ShadowsOfTheNight() { game = this; }
@@ -105,6 +107,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 
 	public void playGame1(boolean start) {
+		lastPercentSpawnExtraShadow = 0;
+		timeForNextMove = 0;
 		if (menuStage != null && start) {
 			menuStage.dispose();
 			menuStage = null;
@@ -246,7 +250,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public static float getHeightRacio() { return Gdx.graphics.getHeight() / 1080f; }
 
-	float timeForNextMove = 0;
+	private float timeForNextMove;
 	@Override
 	public void render() {
 		float delta = Gdx.graphics.getDeltaTime();
@@ -464,8 +468,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		playGame1(false);
 	}
 
-	private float lastPercentSpawnExtraShadow = 0;
-	private float spawnEachXPercent = 0.0003f;
 	private void spawnExtraShadow() {
 		if (lastPercentSpawnExtraShadow + spawnEachXPercent < Math.pow(chrono.getPercentElapsedTime(), 2)) {
 			System.out.println(
