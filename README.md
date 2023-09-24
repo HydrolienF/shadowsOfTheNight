@@ -1,8 +1,11 @@
 # shadowsOfTheNight
 1 week game jam project for theme: A Terrifying (K)Night &amp; Light Hurts
 
+Play on web there https://hydrolien.itch.io/shadows-of-the-night
+
 
 Launch with `./gradlew html:superDev`
+
 Then got to `http://localhost:8080/`
 
 
