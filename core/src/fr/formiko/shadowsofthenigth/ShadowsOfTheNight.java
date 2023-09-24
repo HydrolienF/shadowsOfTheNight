@@ -32,7 +32,9 @@ import box2dLight.RayHandler;
 
 public class ShadowsOfTheNight extends ApplicationAdapter {
 	public static Camera camera;
+	public static Camera camera2;
 	private ScreenViewport viewport;
+	private ScreenViewport viewport2;
 	private SpriteBatch batch;
 	private Stage stage1;
 	private Stage stage2;
@@ -58,7 +60,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	private boolean playerIsShadow;
 	public Bed bed;
 	private int toysLeft;
-	private BoyLight cl;
+	public BoyLight cl;
+	public static float TIME_STEP = 1 / 60f;
+	public static float PIXEL_PER_METER = 100f;
 
 
 	public ShadowsOfTheNight() { game = this; }
@@ -73,6 +77,13 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		Box2D.init();
 		debugRenderer = new Box2DDebugRenderer(); // @a
 		camera = new OrthographicCamera();
+		camera2 = new OrthographicCamera(Gdx.graphics.getWidth() / PIXEL_PER_METER, Gdx.graphics.getHeight() / PIXEL_PER_METER);
+		camera2.position.set(camera2.viewportWidth / 2f, camera2.viewportHeight / 2f, 0);
+		camera2.update();
+		// camera2 = new OrthographicCamera();
+		// viewport2 = new ScreenViewport(camera2);
+		// viewport2.setUnitsPerPixel(PIXEL_PER_METER);
+		// camera2.translate(1920 / 2, 1080 / 2, 0);
 		viewport = new ScreenViewport(camera);
 		batch = new SpriteBatch();
 		assets = new Assets();
@@ -144,9 +155,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public void addHud() {
 		hud = new Stage(viewport, batch);
-		int minOfGame = 8;
+		float minOfGame = 8f;
 		// TODO do a 8 min long music named game.mp3
-		chrono = new Chrono(minOfGame * 60 * 1000, 20, 7);
+		chrono = new Chrono((int) (minOfGame * 60 * 1000), 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override
 			public void act(float delta) {
@@ -179,7 +190,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	public void spawnAShadow() {
 		Shadow shadow = new Shadow(500);
 		shadow.setScale(0.1f);
-		shadow.setPosition(Gdx.graphics.getWidth() - 100 * getWidthRacio(), 100 * getHeightRacio());
+		shadow.setPosition(Gdx.graphics.getWidth() - 200 * getWidthRacio(), 200 * getHeightRacio());
 		shadows.add(shadow);
 		stage1.addActor(shadow);
 		shadow.isPlayer = playerIsShadow;
@@ -195,7 +206,7 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// pl.setSoft(true);
 		if (start) {
 			cl = new BoyLight(rayHandler);
-			cl.setPosition(350 * getWidthRacio(), 480 * getHeightRacio());
+			cl.setPosition(350 * getWidthRacio() / PIXEL_PER_METER, 480 * getHeightRacio() / PIXEL_PER_METER);
 
 			// TODO shadow AI try to avoid light if it's to close from them.
 		} else {
@@ -222,7 +233,9 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 				addShadowToRemove(shadow, true);
 			}
 		}
-		cl.act();
+		if (cl != null) {
+			cl.act();
+		}
 
 		// ScreenUtils.clear(0, 0, 1, 1);
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
@@ -241,14 +254,14 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 			stage2.draw();
 		}
 		if (world != null) {
-			world.step(1 / 60f, 6, 2);
+			world.step(TIME_STEP, 6, 2);
 			if (debugRenderer != null) {
-				debugRenderer.render(world, camera.combined);
+				debugRenderer.render(world, camera2.combined);
 			}
 		}
 
 		if (stage1 != null) {
-			rayHandler.setCombinedMatrix(stage1.getCamera().combined, 0, 0, 1, 1);
+			rayHandler.setCombinedMatrix(camera2.combined, 0, 0, 1, 1);
 			rayHandler.updateAndRender();
 		}
 

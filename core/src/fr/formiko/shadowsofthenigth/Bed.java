@@ -17,6 +17,10 @@ public class Bed extends Image {
     }
 
     public void createBody(float x, float y, float width, float height) {
+        x = x / ShadowsOfTheNight.PIXEL_PER_METER;
+        y = y / ShadowsOfTheNight.PIXEL_PER_METER;
+        width = width / ShadowsOfTheNight.PIXEL_PER_METER;
+        height = height / ShadowsOfTheNight.PIXEL_PER_METER;
         // Create our body definition
         BodyDef groundBodyDef = new BodyDef();
         // Set its world position

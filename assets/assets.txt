@@ -5,6 +5,11 @@ fonts/bloody40.fnt
 fonts/bloody40.png
 fonts/dominican.fnt
 fonts/dominican.png
+hs_err_pid13616.log
+hs_err_pid21664.log
+hs_err_pid24036.log
+hs_err_pid5484.log
+hs_err_pid8932.log
 images/MainImage.png
 images/null.png
 images/spine/Frenchzebutt/Frenchzebutt.atlas

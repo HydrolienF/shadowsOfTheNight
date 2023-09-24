@@ -10,15 +10,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.esotericsoftware.spine.Slot;
 
 public class Shadow extends SActor {
     private Color bodyColor;
     public boolean isPlayer;
-    public static final float MAX_VELOCITY = 40000f;
-    public static final float MAX_INPULSE = 10000f;
+    public static final float MAX_VELOCITY = 3f;
+    public static final float MAX_INPULSE = 5f;
     Vector2 targetedPos;
     private int visionRadius;
     private static final float SIZE = 40f;
@@ -34,7 +33,7 @@ public class Shadow extends SActor {
         body.setUserData(this);
     }
 
-    public float getRadius() { return SIZE * ShadowsOfTheNight.getWidthRacio(); }
+    public float getRadius() { return SIZE * ShadowsOfTheNight.getWidthRacio() / ShadowsOfTheNight.PIXEL_PER_METER; }
 
     public List<Vector2> getHitPoints() {
         List<Vector2> hitPoints = new LinkedList<>();
@@ -43,14 +42,14 @@ public class Shadow extends SActor {
         // float y = getY() + getRadius() * MathUtils.sinDeg(i);
         // hitPoints.add(new Vector2(x, y));
         // }
-        hitPoints.add(new Vector2(getX() + getRadius(), getY()));
-        hitPoints.add(new Vector2(getX() - getRadius(), getY()));
-        hitPoints.add(new Vector2(getX(), getY() + getRadius()));
-        hitPoints.add(new Vector2(getX(), getY() - getRadius()));
-        hitPoints.add(new Vector2(getX() + getRadius(), getY() + getRadius()));
-        hitPoints.add(new Vector2(getX() - getRadius(), getY() - getRadius()));
-        hitPoints.add(new Vector2(getX() + getRadius(), getY() - getRadius()));
-        hitPoints.add(new Vector2(getX() - getRadius(), getY() + getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x + getRadius(), body.getPosition().y));
+        hitPoints.add(new Vector2(body.getPosition().x - getRadius(), body.getPosition().y));
+        hitPoints.add(new Vector2(body.getPosition().x, body.getPosition().y + getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x, body.getPosition().y - getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x + getRadius(), body.getPosition().y + getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x - getRadius(), body.getPosition().y - getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x + getRadius(), body.getPosition().y - getRadius()));
+        hitPoints.add(new Vector2(body.getPosition().x - getRadius(), body.getPosition().y + getRadius()));
         return hitPoints;
     }
 
@@ -74,31 +73,32 @@ public class Shadow extends SActor {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 5f;
-        fixtureDef.friction = 0.4f;
+        // fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.6f; // Make it bounce a little bit
 
         // Create our fixture and attach it to the body
-        Fixture fixture = body.createFixture(fixtureDef);
+        body.createFixture(fixtureDef);
 
         // Remember to dispose of any shapes after you're done with them!
         // BodyDef and FixtureDef don't need disposing, but shapes do.
         circle.dispose();
     }
-
+    float timeForNextMove = 0;
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (isPlayer) {
-            applyPlayerMove(delta);
-        } else {
-            tryToReachBed(delta);
+        timeForNextMove += delta;
+        while (timeForNextMove > ShadowsOfTheNight.TIME_STEP) {
+            timeForNextMove -= ShadowsOfTheNight.TIME_STEP;
+            if (isPlayer) {
+                applyPlayerMove(delta);
+            } else {
+                tryToReachBed(delta);
+            }
+            this.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
         }
-        // if(delete){
-        // world.destroyBody(body);
-        // this.remove();
-        // }
-        this.setRotation(body.getAngle() * MathUtils.radiansToDegrees);
-        this.setPosition(body.getPosition().x - this.getWidth() / 2, body.getPosition().y - this.getHeight() / 2);
+        this.setPosition(body.getPosition().x * ShadowsOfTheNight.PIXEL_PER_METER - this.getWidth() / 2,
+                body.getPosition().y * ShadowsOfTheNight.PIXEL_PER_METER - this.getHeight() / 2);
     }
 
     public void applyPlayerMove(float delta) {
@@ -106,26 +106,27 @@ public class Shadow extends SActor {
 
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
-        float racio = delta * 60f;
+
+        // float racio = delta * 60f;
         // TODO TOFIX shadow should move with same speed whatever the framerate is
         // body.applyForceToCenter(1.0f, 0.0f, true);
 
         // apply left impulse, but only if max velocity is not reached yet
         if (Gdx.input.isKeyPressed(Keys.LEFT) && vel.x > -MAX_VELOCITY) {
-            body.applyLinearImpulse(-MAX_INPULSE * racio, 0, pos.x, pos.y, true);
+            body.applyForceToCenter(-MAX_INPULSE, 0, true);
         }
 
         // apply right impulse, but only if max velocity is not reached yet
         if (Gdx.input.isKeyPressed(Keys.RIGHT) && vel.x < MAX_VELOCITY) {
-            body.applyLinearImpulse(MAX_INPULSE * racio, 0, pos.x, pos.y, true);
+            body.applyForceToCenter(MAX_INPULSE, 0, true);
         }
 
         if (Gdx.input.isKeyPressed(Keys.UP) && vel.y < MAX_VELOCITY) {
-            body.applyLinearImpulse(0, MAX_INPULSE * racio, pos.x, pos.y, true);
+            body.applyForceToCenter(0, MAX_INPULSE, true);
         }
 
         if (Gdx.input.isKeyPressed(Keys.DOWN) && vel.y > -MAX_VELOCITY) {
-            body.applyLinearImpulse(0, -MAX_INPULSE * racio, pos.x, pos.y, true);
+            body.applyForceToCenter(0, -MAX_INPULSE, true);
         }
 
         // set rotation of the body from the direction of the velocity
@@ -136,16 +137,30 @@ public class Shadow extends SActor {
         Bed bed = ShadowsOfTheNight.game.bed;
         Vector2 vel = body.getLinearVelocity();
         Vector2 pos = body.getPosition();
-        if (pos.dst(bed.body.getPosition()) < visionRadius) {
+        if (pos.dst(bed.body.getPosition()) < visionRadius / ShadowsOfTheNight.PIXEL_PER_METER) {
+            System.out.println("Target bed");
             targetedPos = bed.body.getPosition();
         } else if (targetedPos == null) { // when it hit an obstacle targetedPos is set to null
             targetedPos = getRandomPosOutsideOfObstacle();
-        } else if (pos.dst(targetedPos) < 150) { // when it reach the targetedPos, get a new one
+        } else if (pos.dst(targetedPos) < 50 / ShadowsOfTheNight.PIXEL_PER_METER) { // when it reach the targetedPos, get a new one
+            System.out.println("reach target");
+            targetedPos = getRandomPosOutsideOfObstacle();
+            // if it will reach light in 100 pixels, get a new target position
+        } else if (ShadowsOfTheNight.game.cl.contains(body.getPosition().x + vel.x * 300 / ShadowsOfTheNight.PIXEL_PER_METER,
+                body.getPosition().y + vel.y * 300 / ShadowsOfTheNight.PIXEL_PER_METER)) {
+            System.out.println("will hit light");
             targetedPos = getRandomPosOutsideOfObstacle();
         }
         // TODO avoid light
 
-        body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
+        // body.applyLinearImpulse((targetedPos.x - pos.x) * 1000f * delta, (targetedPos.y - pos.y) * 1000f * delta, pos.x, pos.y, true);
+        // if (vel.len() < MAX_VELOCITY) {
+        body.applyForceToCenter(MAX_INPULSE * (targetedPos.x - pos.x), MAX_INPULSE * (targetedPos.y - pos.y), true);
+        // }
+
+        // reduce speed if it is too high
+        // if (vel.len() > MAX_VELOCITY)
+        // body.applyForceToCenter(-MAX_INPULSE * vel.x, -MAX_INPULSE * vel.y, true);
 
 
         // float racio = delta * 60f;
@@ -155,19 +170,15 @@ public class Shadow extends SActor {
     }
 
     private Vector2 getRandomPosOutsideOfObstacle() {
-        // while (true) {
-        // Vector2 randomPos = new Vector2(MathUtils.random(0, Gdx.graphics.getWidth()), MathUtils.random(0, Gdx.graphics.getHeight()));
-        // // TODO if is outside of an obstacle
-        // // for ()
-        // return randomPos;
-        // }
-        return new Vector2(MathUtils.random(120, Gdx.graphics.getWidth() - 120), MathUtils.random(120, Gdx.graphics.getHeight() - 120));
+        // will work only for walls
+        return new Vector2(MathUtils.random(120, Gdx.graphics.getWidth() - 120) / ShadowsOfTheNight.PIXEL_PER_METER,
+                MathUtils.random(120, Gdx.graphics.getHeight() - 120) / ShadowsOfTheNight.PIXEL_PER_METER);
     }
 
     @Override
     public void setPosition(float x, float y) {
         super.setPosition(x, y);
-        body.setTransform(x, y, 0);
+        body.setTransform(x / ShadowsOfTheNight.PIXEL_PER_METER, y / ShadowsOfTheNight.PIXEL_PER_METER, 0);
     }
 
     @Override
