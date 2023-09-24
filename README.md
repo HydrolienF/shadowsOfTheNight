@@ -16,6 +16,4 @@ Font: James Fordyce !https://www.1001freefonts.com/bloody.font
 
 # TODO
 <!-- use normal mode color with brosse Texture "Hose 03" -->
-Add boy toys on map
-Add mom at start
 dialogues show 1 by one ?
