@@ -82,10 +82,6 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		camera2 = new OrthographicCamera(Gdx.graphics.getWidth() / PIXEL_PER_METER, Gdx.graphics.getHeight() / PIXEL_PER_METER);
 		camera2.position.set(camera2.viewportWidth / 2f, camera2.viewportHeight / 2f, 0);
 		camera2.update();
-		// camera2 = new OrthographicCamera();
-		// viewport2 = new ScreenViewport(camera2);
-		// viewport2.setUnitsPerPixel(PIXEL_PER_METER);
-		// camera2.translate(1920 / 2, 1080 / 2, 0);
 		viewport = new ScreenViewport(camera);
 		batch = new SpriteBatch();
 		assets = new Assets();
@@ -139,6 +135,10 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 		// meubles
 
 		if (start) {
+			stage1.addActor(new Obstacle(800 * getWidthRacio(), 120 * getHeightRacio(), 350 * getWidthRacio(), 125 * getHeightRacio()));
+			stage1.addActor(new Obstacle(830 * getWidthRacio(), 780 * getHeightRacio(), 360 * getWidthRacio(), 200 * getHeightRacio()));
+			stage1.addActor(new Obstacle(935 * getWidthRacio(), 680 * getHeightRacio(), 160 * getWidthRacio(), 120 * getHeightRacio()));
+			stage1.addActor(new Obstacle(120 * getWidthRacio(), 780 * getHeightRacio(), 535 * getWidthRacio(), 300 * getHeightRacio()));
 			bed = new Bed(50 * getWidthRacio(), 400 * getHeightRacio(), 450 * getWidthRacio(), 260 * getHeightRacio());
 			stage1.addActor(bed);
 		}
@@ -157,8 +157,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 
 	public void addHud() {
 		hud = new Stage(viewport, batch);
-		float minOfGame = 8f;
-		// TODO do a 8 min long music named game.mp3
+		float minOfGame = 5f;
+		// TODO do a x min long music named game.mp3 with all game music.
 		chrono = new Chrono((int) (minOfGame * 60 * 1000), 20, 7);
 		chronoLabel = new Label(chrono.getCurrentHour(), labelStyle) {
 			@Override

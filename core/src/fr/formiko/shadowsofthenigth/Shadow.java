@@ -20,7 +20,7 @@ public class Shadow extends SActor {
     public static final float MAX_INPULSE = 5f;
     Vector2 targetedPos;
     private int visionRadius;
-    private static final float SIZE = 40f;
+    private static final float SIZE = 30f;
 
     public Shadow(int visionRadius) {
         super("shadow");

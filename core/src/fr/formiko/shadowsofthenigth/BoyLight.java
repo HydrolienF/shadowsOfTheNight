@@ -24,7 +24,7 @@ public class BoyLight extends ConeLight {
                 setDirection(getDirection() - maxMoveSpeed);
             }
         } else {
-            maxMoveSpeed = 0.05f * (1 + 2 * (ShadowsOfTheNight.game.toysAtStart - ShadowsOfTheNight.game.toysLeft));
+            maxMoveSpeed = 0.05f * (1 + 1.8f * (ShadowsOfTheNight.game.toysAtStart - ShadowsOfTheNight.game.toysLeft));
             if (getDirection() > 90) {
                 moveUp = false;
             } else if (getDirection() < -90) {
