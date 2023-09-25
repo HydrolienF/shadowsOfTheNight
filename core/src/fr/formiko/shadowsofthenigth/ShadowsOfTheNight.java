@@ -216,8 +216,8 @@ public class ShadowsOfTheNight extends ApplicationAdapter {
 	}
 
 	public void spawnAShadow() {
-		Shadow shadow = new Shadow(500, playerIsShadow);
-		shadow.setScale(0.1f);
+		Shadow shadow = new Shadow((int)(500 * getWidthRacio()), playerIsShadow);
+		shadow.setScale(0.1f * getWidthRacio());
 		shadow.setPosition(Gdx.graphics.getWidth() - 200 * getWidthRacio(), MathUtils.random(200, 880) * getHeightRacio());
 		shadows.add(shadow);
 		stage1.addActor(shadow);

@@ -16,8 +16,8 @@ import com.esotericsoftware.spine.Slot;
 public class Shadow extends SActor {
     private Color bodyColor;
     public boolean isPlayer;
-    public static final float MAX_VELOCITY = 3f;
-    public static final float MAX_INPULSE = 5f;
+    public static float MAX_VELOCITY;
+    public static float MAX_INPULSE;
     Vector2 targetedPos;
     private int visionRadius;
     private static final float SIZE = 30f;
@@ -36,6 +36,9 @@ public class Shadow extends SActor {
         }
         createBody();
         body.setUserData(this);
+
+        MAX_INPULSE = 5f * ShadowsOfTheNight.getWidthRacio();
+        MAX_VELOCITY = 3f * ShadowsOfTheNight.getWidthRacio();
     }
 
     public float getRadius() { return SIZE * ShadowsOfTheNight.getWidthRacio() / ShadowsOfTheNight.PIXEL_PER_METER; }
